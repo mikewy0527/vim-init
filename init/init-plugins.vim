@@ -44,8 +44,8 @@ endif
 " colortheme group --------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'colortheme')
     let s:plugin_subgroup['hexokinase'] = 1
-    " let s:plugin_subgroup['airline']    = 1
-    let s:plugin_subgroup['lightline']  = 1
+    let s:plugin_subgroup['airline']    = 1
+    " let s:plugin_subgroup['lightline']  = 1
 endif
 ".}}}2
 
