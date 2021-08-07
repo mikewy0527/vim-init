@@ -106,7 +106,7 @@ call plug#begin(get(g:, 'bundle_home', '~/.vim/bundles'))
 if has_key(g:bundle_group, 'basic')
     if has_key(s:plugin_subgroup, 'one')
         " Use the fork for better performance than 'rakr/vim-one', but have bug in switch color theme
-        Plug 'laggardkernel/vim-one'
+        Plug 'mikewy0527/vim-one'
         " Plug 'joshdick/onedark.vim'
     endif
 
@@ -192,7 +192,7 @@ endif
 " filetype group ----------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'ft_enhance')
     if has_key(s:plugin_subgroup, 'cpp-enhance-hi')
-        Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
+        Plug 'mikewy0527/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
     endif
 
     if has_key(s:plugin_subgroup, 'pysynenhance')
