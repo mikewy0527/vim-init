@@ -17,42 +17,188 @@
 
 
 "----------------------------------------------------------------------
-" INSERT 模式下使用 EMACS 键位
+" INSERT/COMMAND 模式下 Bash 式键映射
+" 函数定义参考 https://github.com/houtsnip/vim-emacscommandline
 "----------------------------------------------------------------------
-inoremap <c-a> <home>
-inoremap <c-e> <end>
-inoremap <c-d> <del>
-inoremap <c-_> <c-k>
+noremap! <C-a> <Home>
+inoremap <C-e> <End>
+noremap! <C-b> <Left>
+noremap! <C-f> <Right>
+inoremap <C-p> <Up>
+inoremap <C-n> <Down>
+
+" ALT+j/k 逻辑跳转下一行/上一行（按 wrap 逻辑换行进行跳转）
+nnoremap <M-j> gj
+nnoremap <M-k> gk
+inoremap <M-j> <C-\><C-o>gj
+inoremap <M-k> <C-\><C-o>gk
+
+inoremap <M-b> <S-Left>
+inoremap <M-f> <S-Right>
+cnoremap <M-b> <C-\>e <SID>BackwardWord()<CR>
+cnoremap <M-f> <C-\>e <SID>ForwardWord()<CR>
+
+" delete form cursor to line-end
+" In COMMAND mode, use custom function to make Yank and Undo work correctly
+inoremap <C-k> <C-\><C-o>D
+cnoremap <C-k> <C-\>e <SID>KillLine()<CR>
+cnoremap <C-u> <C-\>e <SID>BackwardKillLine()<CR>
+
+" delete-forward word
+inoremap <M-d> <C-\><C-o>dw
+cnoremap <M-d> <C-\>e <SID>KillWord()<CR>
+cnoremap <C-w> <C-\>e <SID>BackwardKillWord()<CR>
+
+cnoremap <C-y> <C-\>e <SID>Yank()<CR>
+cnoremap <C-_> <C-\>e <SID>Undo()<CR>
 
 
-"----------------------------------------------------------------------
-" 设置 CTRL+HJKL 移动光标（INSERT 模式偶尔需要移动的方便些）
-" 使用 SecureCRT/XShell 等终端软件需设置：Backspace sends delete
-" 详见：http://www.skywind.me/blog/archives/2021
-"----------------------------------------------------------------------
-noremap <C-h> <left>
-noremap <C-j> <down>
-noremap <C-k> <up>
-noremap <C-l> <right>
-inoremap <C-h> <left>
-inoremap <C-j> <down>
-inoremap <C-k> <up>
-inoremap <C-l> <right>
+if !exists('g:CmdlineMaxUndoHistory')
+    let g:CmdlineMaxUndoHistory = 100
+endif
 
+if !exists('g:CmdlineWordCharCharacterClass')
+    " Latin-1, Latin Extended-A, Extended-B, Greek and Coptic, and Cyrillic scripts:
+    "let g:CmdlineWordCharCharacterClass = 'a-zA-Z0-9_À-ÖØ-öø-ÿĀ-ǿȀ-ɏͰ-ͳͶͷΆΈΉΊΌΎ-ΡΣ-ώϚ-ϯϷϸϺϻЀ-ҁ'
+    " Latin-1 (the most common European letters):
+    let g:CmdlineWordCharCharacterClass = 'a-zA-Z0-9_À-ÖØ-öø-ÿ'
+    " Basic Latin (unaccented) word characters:
+    "let g:CmdlineWordCharCharacterClass = '\w'
+endif
 
-"----------------------------------------------------------------------
-" 命令模式的快速移动
-"----------------------------------------------------------------------
-cnoremap <c-h> <left>
-cnoremap <c-j> <down>
-cnoremap <c-k> <up>
-cnoremap <c-l> <right>
-cnoremap <c-a> <home>
-cnoremap <c-e> <end>
-cnoremap <c-f> <c-d>
-cnoremap <c-b> <left>
-cnoremap <c-d> <del>
-cnoremap <c-_> <c-k>
+function! <SID>ForwardWord()
+    let l:loc = strpart(getcmdline(), 0, getcmdpos() - 1)
+    let l:roc = strpart(getcmdline(), getcmdpos() - 1)
+    if l:roc =~ '\v^\s*[' . g:CmdlineWordCharCharacterClass . ']'
+        let l:rem = matchstr(l:roc, '\v^\s*[' . g:CmdlineWordCharCharacterClass . ']+')
+    elseif l:roc =~ '\v^\s*[^[:alnum:]_[:blank:]]'
+        let l:rem = matchstr(l:roc, '\v^\s*[^[:alnum:]_[:blank:]]+')
+    else
+        call setcmdpos(strlen(getcmdline()) + 1)
+        return getcmdline()
+    endif
+    call setcmdpos(strlen(l:loc) + strlen(l:rem) + 1)
+    return getcmdline()
+endfunction
+
+function! <SID>BackwardWord()
+    let l:loc = strpart(getcmdline(), 0, getcmdpos() - 1)
+    let l:roc = strpart(getcmdline(), getcmdpos() - 1)
+    if l:loc =~ '\v[' . g:CmdlineWordCharCharacterClass . ']\s*$'
+        let l:rem = matchstr(l:loc, '\v[' . g:CmdlineWordCharCharacterClass . ']+\s*$')
+    elseif l:loc =~ '\v[^[:alnum:]_[:blank:]]\s*$'
+        let l:rem = matchstr(l:loc, '\v[^[:alnum:]_[:blank:]]+\s*$')
+    else
+        call setcmdpos(1)
+        return getcmdline()
+    endif
+    let @c = l:rem
+    call setcmdpos(strlen(l:loc) - strlen(l:rem) + 1)
+    return getcmdline()
+endfunction
+
+function! <SID>KillLine()
+    call <SID>SaveUndoHistory(getcmdline(), getcmdpos())
+    let l:cmd = getcmdline()
+    let l:rem = strpart(l:cmd, getcmdpos() - 1)
+    if '' != l:rem
+        let @c = l:rem
+    endif
+    let l:ret = strpart(l:cmd, 0, getcmdpos() - 1)
+    call <SID>SaveUndoHistory(l:ret, getcmdpos())
+    return l:ret
+endfunction
+
+function! <SID>BackwardKillLine()
+    call <SID>SaveUndoHistory(getcmdline(), getcmdpos())
+    let l:cmd = getcmdline()
+    let l:rem = strpart(l:cmd, 0, getcmdpos() - 1)
+    if '' != l:rem
+        let @c = l:rem
+    endif
+    let l:ret = strpart(l:cmd, getcmdpos() - 1)
+    call <SID>SaveUndoHistory(l:ret, 1)
+    call setcmdpos(1)
+    return l:ret
+endfunction
+
+function! <SID>KillWord()
+    call <SID>SaveUndoHistory(getcmdline(), getcmdpos())
+    let l:loc = strpart(getcmdline(), 0, getcmdpos() - 1)
+    let l:roc = strpart(getcmdline(), getcmdpos() - 1)
+    if l:roc =~ '\v^\s*[' . g:CmdlineWordCharCharacterClass . ']'
+        let l:rem = matchstr(l:roc, '\v^\s*[' . g:CmdlineWordCharCharacterClass . ']+')
+    elseif l:roc =~ '\v^\s*[^[:alnum:]_[:blank:]]'
+        let l:rem = matchstr(l:roc, '\v^\s*[^[:alnum:]_[:blank:]]+')
+    elseif l:roc =~ '\v^\s+$'
+        let @c = l:roc
+        return l:loc
+    else
+        return getcmdline()
+    endif
+    let @c = l:rem
+    let l:ret = l:loc . strpart(l:roc, strlen(l:rem))
+    call <SID>SaveUndoHistory(l:ret, getcmdpos())
+    return l:ret
+endfunction
+
+function! <SID>BackwardKillWord()
+    " Do same as in-built Ctrl-W, except assign deleted text to @c
+    call <SID>SaveUndoHistory(getcmdline(), getcmdpos())
+    let l:loc = strpart(getcmdline(), 0, getcmdpos() - 1)
+    let l:roc = strpart(getcmdline(), getcmdpos() - 1)
+    if l:loc =~ '\v[' . g:CmdlineWordCharCharacterClass . ']\s*$'
+        let l:rem = matchstr(l:loc, '\v[' . g:CmdlineWordCharCharacterClass . ']+\s*$')
+    elseif l:loc =~ '\v[^[:alnum:]_[:blank:]]\s*$'
+        let l:rem = matchstr(l:loc, '\v[^[:alnum:]_[:blank:]]+\s*$')
+    elseif l:loc =~ '\v^\s+$'
+        let @c = l:loc
+        call setcmdpos(1)
+        return l:roc
+    else
+        return getcmdline()
+    endif
+    let @c = l:rem
+    let l:pos = getcmdpos() - strlen(l:rem)
+    let l:ret = strpart(l:loc, 0, strlen(l:loc) - strlen(l:rem)) . l:roc
+    call <SID>SaveUndoHistory(l:ret, l:pos)
+    call setcmdpos(l:pos)
+    return l:ret
+endfunction
+
+let s:oldcmdline = [ ]
+function! <SID>SaveUndoHistory(cmdline, cmdpos)
+    if len(s:oldcmdline) == 0 || a:cmdline != s:oldcmdline[0][0]
+        call insert(s:oldcmdline, [ a:cmdline, a:cmdpos ], 0)
+    else
+        let s:oldcmdline[0][1] = a:cmdpos
+    endif
+    if len(s:oldcmdline) > g:CmdlineMaxUndoHistory
+        call remove(s:oldcmdline, g:CmdlineMaxUndoHistory)
+    endif
+endfunction
+
+function! <SID>Yank()
+    let l:cmd = getcmdline()
+    call setcmdpos(getcmdpos() + strlen(@c))
+    return strpart(l:cmd, 0, getcmdpos() - 1) . @c . strpart(l:cmd, getcmdpos() - 1)
+endfunction
+
+function! <SID>Undo()
+    if len(s:oldcmdline) == 0
+        return getcmdline()
+    endif
+    if getcmdline() ==# s:oldcmdline[0][0]
+        call remove(s:oldcmdline, 0)
+        if len(s:oldcmdline) == 0
+            return getcmdline()
+        endif
+    endif
+    let l:ret = s:oldcmdline[0][0]
+    call setcmdpos(s:oldcmdline[0][1])
+    call remove(s:oldcmdline, 0)
+    return l:ret
+endfunction
 
 
 "----------------------------------------------------------------------
@@ -73,60 +219,61 @@ noremap <silent><leader>0 10gt<cr>
 "----------------------------------------------------------------------
 " ALT+N 切换 tab
 "----------------------------------------------------------------------
-noremap <silent><m-1> :tabn 1<cr>
-noremap <silent><m-2> :tabn 2<cr>
-noremap <silent><m-3> :tabn 3<cr>
-noremap <silent><m-4> :tabn 4<cr>
-noremap <silent><m-5> :tabn 5<cr>
-noremap <silent><m-6> :tabn 6<cr>
-noremap <silent><m-7> :tabn 7<cr>
-noremap <silent><m-8> :tabn 8<cr>
-noremap <silent><m-9> :tabn 9<cr>
-noremap <silent><m-0> :tabn 10<cr>
-inoremap <silent><m-1> <ESC>:tabn 1<cr>
-inoremap <silent><m-2> <ESC>:tabn 2<cr>
-inoremap <silent><m-3> <ESC>:tabn 3<cr>
-inoremap <silent><m-4> <ESC>:tabn 4<cr>
-inoremap <silent><m-5> <ESC>:tabn 5<cr>
-inoremap <silent><m-6> <ESC>:tabn 6<cr>
-inoremap <silent><m-7> <ESC>:tabn 7<cr>
-inoremap <silent><m-8> <ESC>:tabn 8<cr>
-inoremap <silent><m-9> <ESC>:tabn 9<cr>
-inoremap <silent><m-0> <ESC>:tabn 10<cr>
+if has("gui_running")
+    noremap <silent><M-1> :tabn 1<CR>
+    noremap <silent><M-2> :tabn 2<CR>
+    noremap <silent><M-3> :tabn 3<CR>
+    noremap <silent><M-4> :tabn 4<CR>
+    noremap <silent><M-5> :tabn 5<CR>
+    noremap <silent><M-6> :tabn 6<CR>
+    noremap <silent><M-7> :tabn 7<CR>
+    noremap <silent><M-8> :tabn 8<CR>
+    noremap <silent><M-9> :tabn 9<CR>
+    noremap <silent><M-0> :tabn 10<CR>
+    inoremap <silent><M-1> <ESC>:tabn 1<CR>
+    inoremap <silent><M-2> <ESC>:tabn 2<CR>
+    inoremap <silent><M-3> <ESC>:tabn 3<CR>
+    inoremap <silent><M-4> <ESC>:tabn 4<CR>
+    inoremap <silent><M-5> <ESC>:tabn 5<CR>
+    inoremap <silent><M-6> <ESC>:tabn 6<CR>
+    inoremap <silent><M-7> <ESC>:tabn 7<CR>
+    inoremap <silent><M-8> <ESC>:tabn 8<CR>
+    inoremap <silent><M-9> <ESC>:tabn 9<CR>
+    inoremap <silent><M-0> <ESC>:tabn 10<CR>
+endif
 
 
 " MacVim 允许 CMD+数字键快速切换标签
 if has("gui_macvim")
-	set macmeta
-	noremap <silent><d-1> :tabn 1<cr>
-	noremap <silent><d-2> :tabn 2<cr>
-	noremap <silent><d-3> :tabn 3<cr>
-	noremap <silent><d-4> :tabn 4<cr>
-	noremap <silent><d-5> :tabn 5<cr>
-	noremap <silent><d-6> :tabn 6<cr>
-	noremap <silent><d-7> :tabn 7<cr>
-	noremap <silent><d-8> :tabn 8<cr>
-	noremap <silent><d-9> :tabn 9<cr>
-	noremap <silent><d-0> :tabn 10<cr>
-	inoremap <silent><d-1> <ESC>:tabn 1<cr>
-	inoremap <silent><d-2> <ESC>:tabn 2<cr>
-	inoremap <silent><d-3> <ESC>:tabn 3<cr>
-	inoremap <silent><d-4> <ESC>:tabn 4<cr>
-	inoremap <silent><d-5> <ESC>:tabn 5<cr>
-	inoremap <silent><d-6> <ESC>:tabn 6<cr>
-	inoremap <silent><d-7> <ESC>:tabn 7<cr>
-	inoremap <silent><d-8> <ESC>:tabn 8<cr>
-	inoremap <silent><d-9> <ESC>:tabn 9<cr>
-	inoremap <silent><d-0> <ESC>:tabn 10<cr>
+    set macmeta
+    noremap <silent><D-1> :tabn 1<CR>
+    noremap <silent><D-2> :tabn 2<CR>
+    noremap <silent><D-3> :tabn 3<CR>
+    noremap <silent><D-4> :tabn 4<CR>
+    noremap <silent><D-5> :tabn 5<CR>
+    noremap <silent><D-6> :tabn 6<CR>
+    noremap <silent><D-7> :tabn 7<CR>
+    noremap <silent><D-8> :tabn 8<CR>
+    noremap <silent><D-9> :tabn 9<CR>
+    noremap <silent><D-0> :tabn 10<CR>
+    inoremap <silent><D-1> <ESC>:tabn 1<CR>
+    inoremap <silent><D-2> <ESC>:tabn 2<CR>
+    inoremap <silent><D-3> <ESC>:tabn 3<CR>
+    inoremap <silent><D-4> <ESC>:tabn 4<CR>
+    inoremap <silent><D-5> <ESC>:tabn 5<CR>
+    inoremap <silent><D-6> <ESC>:tabn 6<CR>
+    inoremap <silent><D-7> <ESC>:tabn 7<CR>
+    inoremap <silent><D-8> <ESC>:tabn 8<CR>
+    inoremap <silent><D-9> <ESC>:tabn 9<CR>
+    inoremap <silent><D-0> <ESC>:tabn 10<CR>
 endif
-
 
 
 "----------------------------------------------------------------------
 " 缓存：插件 unimpaired 中定义了 [b, ]b 来切换缓存
 "----------------------------------------------------------------------
-noremap <silent> <leader>bn :bn<cr>
-noremap <silent> <leader>bp :bp<cr>
+" noremap <silent> <leader>bn :bn<cr>
+" noremap <silent> <leader>bp :bp<cr>
 
 
 "----------------------------------------------------------------------
@@ -134,58 +281,36 @@ noremap <silent> <leader>bp :bp<cr>
 " 其实还可以用原生的 CTRL+PageUp, CTRL+PageDown 来切换标签
 "----------------------------------------------------------------------
 
-noremap <silent> <leader>tc :tabnew<cr>
-noremap <silent> <leader>tq :tabclose<cr>
-noremap <silent> <leader>tn :tabnext<cr>
-noremap <silent> <leader>tp :tabprev<cr>
-noremap <silent> <leader>to :tabonly<cr>
+noremap <silent> <leader>tc :tabnew<CR>
+noremap <silent> <leader>tq :tabclose<CR>
+noremap <silent> <leader>tn :tabnext<CR>
+noremap <silent> <leader>tp :tabprev<CR>
+noremap <silent> <leader>to :tabonly<CR>
 
 
 " 左移 tab
 function! Tab_MoveLeft()
-	let l:tabnr = tabpagenr() - 2
-	if l:tabnr >= 0
-		exec 'tabmove '.l:tabnr
-	endif
+    let l:tabnr = tabpagenr() - 2
+    if l:tabnr >= 0
+        exec 'tabmove '.l:tabnr
+    endif
 endfunc
 
 " 右移 tab
 function! Tab_MoveRight()
-	let l:tabnr = tabpagenr() + 1
-	if l:tabnr <= tabpagenr('$')
-		exec 'tabmove '.l:tabnr
-	endif
+    let l:tabnr = tabpagenr() + 1
+    if l:tabnr <= tabpagenr('$')
+        exec 'tabmove '.l:tabnr
+    endif
 endfunc
 
-noremap <silent><leader>tl :call Tab_MoveLeft()<cr>
-noremap <silent><leader>tr :call Tab_MoveRight()<cr>
-noremap <silent><m-left> :call Tab_MoveLeft()<cr>
-noremap <silent><m-right> :call Tab_MoveRight()<cr>
+noremap <silent><leader>tl :call Tab_MoveLeft()<CR>
+noremap <silent><leader>tr :call Tab_MoveRight()<CR>
 
-
-"----------------------------------------------------------------------
-" ALT 键移动增强
-"----------------------------------------------------------------------
-
-" ALT+h/l 快速左右按单词移动（正常模式+插入模式）
-noremap <m-h> b
-noremap <m-l> w
-inoremap <m-h> <c-left>
-inoremap <m-l> <c-right>
-
-" ALT+j/k 逻辑跳转下一行/上一行（按 wrap 逻辑换行进行跳转） 
-noremap <m-j> gj
-noremap <m-k> gk
-inoremap <m-j> <c-\><c-o>gj
-inoremap <m-k> <c-\><c-o>gk
-
-" 命令模式下的相同快捷
-cnoremap <m-h> <c-left>
-cnoremap <m-l> <c-right>
-
-" ALT+y 删除到行末
-noremap <m-y> d$
-inoremap <m-y> <c-\><c-o>d$
+if has("gui_running")
+    noremap <silent><M-Left> :call Tab_MoveLeft()<CR>
+    noremap <silent><M-Right> :call Tab_MoveRight()<CR>
+endif
 
 
 "----------------------------------------------------------------------
@@ -193,141 +318,52 @@ inoremap <m-y> <c-\><c-o>d$
 " 传统的 CTRL+hjkl 移动窗口不适用于 vim 8.1 的终端模式，CTRL+hjkl 在
 " bash/zsh 及带文本界面的程序中都是重要键位需要保留，不能 tnoremap 的
 "----------------------------------------------------------------------
-noremap <m-H> <c-w>h
-noremap <m-L> <c-w>l
-noremap <m-J> <c-w>j
-noremap <m-K> <c-w>k
-inoremap <m-H> <esc><c-w>h
-inoremap <m-L> <esc><c-w>l
-inoremap <m-J> <esc><c-w>j
-inoremap <m-K> <esc><c-w>k
+noremap <M-H> <C-w>h
+noremap <M-L> <C-w>l
+noremap <M-J> <C-w>j
+noremap <M-K> <C-w>k
+inoremap <M-H> <Esc><C-w>h
+inoremap <M-L> <Esc><C-w>l
+inoremap <M-J> <Esc><C-w>j
+inoremap <M-K> <Esc><C-w>k
 
 if has('terminal') && exists(':terminal') == 2 && has('patch-8.1.1')
-	" vim 8.1 支持 termwinkey ，不需要把 terminal 切换成 normal 模式
-	" 设置 termwinkey 为 CTRL 加减号（GVIM），有些终端下是 CTRL+?
-	" 后面四个键位是搭配 termwinkey 的，如果 termwinkey 更改，也要改
-	set termwinkey=<c-_>
-	tnoremap <m-H> <c-_>h
-	tnoremap <m-L> <c-_>l
-	tnoremap <m-J> <c-_>j
-	tnoremap <m-K> <c-_>k
-	tnoremap <m-q> <c-\><c-n>
+    " vim 8.1 支持 termwinkey ，不需要把 terminal 切换成 normal 模式
+    " 设置 termwinkey 为 CTRL 加减号（GVIM），有些终端下是 CTRL+?
+    " 后面四个键位是搭配 termwinkey 的，如果 termwinkey 更改，也要改
+    set termwinkey=<C-_>
+    tnoremap <M-H> <C-_>h
+    tnoremap <M-L> <C-_>l
+    tnoremap <M-J> <C-_>j
+    tnoremap <M-K> <C-_>k
+    tnoremap <M-q> <C-\><C-n>
+
+    tnoremap <M-1> <C-_>1gt
+    tnoremap <M-2> <C-_>2gt
+    tnoremap <M-3> <C-_>3gt
+    tnoremap <M-4> <C-_>4gt
+    tnoremap <M-5> <C-_>5gt
+    tnoremap <M-6> <C-_>6gt
+    tnoremap <M-7> <C-_>7gt
+    tnoremap <M-8> <C-_>8gt
+    tnoremap <M-9> <C-_>9gt
+    tnoremap <M-0> <C-_>10gt
 elseif has('nvim')
-	" neovim 没有 termwinkey 支持，必须把 terminal 切换回 normal 模式
-	tnoremap <m-H> <c-\><c-n><c-w>h
-	tnoremap <m-L> <c-\><c-n><c-w>l
-	tnoremap <m-J> <c-\><c-n><c-w>j
-	tnoremap <m-K> <c-\><c-n><c-w>k
-	tnoremap <m-q> <c-\><c-n>
+    " neovim 没有 termwinkey 支持，必须把 terminal 切换回 normal 模式
+    tnoremap <M-H> <C-\><C-n><C-w>h
+    tnoremap <M-L> <C-\><C-n><C-w>l
+    tnoremap <M-J> <C-\><C-n><C-w>j
+    tnoremap <M-K> <C-\><C-n><C-w>k
+    tnoremap <M-q> <C-\><C-n>
+
+    tnoremap <M-1> <C-\><C-n>1gt
+    tnoremap <M-2> <C-\><C-n>2gt
+    tnoremap <M-3> <C-\><C-n>3gt
+    tnoremap <M-4> <C-\><C-n>4gt
+    tnoremap <M-5> <C-\><C-n>5gt
+    tnoremap <M-6> <C-\><C-n>6gt
+    tnoremap <M-7> <C-\><C-n>7gt
+    tnoremap <M-8> <C-\><C-n>8gt
+    tnoremap <M-9> <C-\><C-n>9gt
+    tnoremap <M-0> <C-\><C-n>10gt
 endif
-
-
-
-"----------------------------------------------------------------------
-" 编译运行 C/C++ 项目
-" 详细见：http://www.skywind.me/blog/archives/2084
-"----------------------------------------------------------------------
-
-" 自动打开 quickfix window ，高度为 6
-let g:asyncrun_open = 6
-
-" 任务结束时候响铃提醒
-let g:asyncrun_bell = 1
-
-" 设置 F10 打开/关闭 Quickfix 窗口
-nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>
-
-" F9 编译 C/C++ 文件
-nnoremap <silent> <F9> :AsyncRun gcc -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
-
-" F5 运行文件
-nnoremap <silent> <F5> :call ExecuteFile()<cr>
-
-" F7 编译项目
-nnoremap <silent> <F7> :AsyncRun -cwd=<root> make <cr>
-
-" F8 运行项目
-nnoremap <silent> <F8> :AsyncRun -cwd=<root> -raw make run <cr>
-
-" F6 测试项目
-nnoremap <silent> <F6> :AsyncRun -cwd=<root> -raw make test <cr>
-
-" 更新 cmake
-nnoremap <silent> <F4> :AsyncRun -cwd=<root> cmake . <cr>
-
-" Windows 下支持直接打开新 cmd 窗口运行
-if has('win32') || has('win64')
-	nnoremap <silent> <F8> :AsyncRun -cwd=<root> -mode=4 make run <cr>
-endif
-
-
-"----------------------------------------------------------------------
-" F5 运行当前文件：根据文件类型判断方法，并且输出到 quickfix 窗口
-"----------------------------------------------------------------------
-function! ExecuteFile()
-	let cmd = ''
-	if index(['c', 'cpp', 'rs', 'go'], &ft) >= 0
-		" native 语言，把当前文件名去掉扩展名后作为可执行运行
-		" 写全路径名是因为后面 -cwd=? 会改变运行时的当前路径，所以写全路径
-		" 加双引号是为了避免路径中包含空格
-		let cmd = '"$(VIM_FILEDIR)/$(VIM_FILENOEXT)"'
-	elseif &ft == 'python'
-		let $PYTHONUNBUFFERED=1 " 关闭 python 缓存，实时看到输出
-		let cmd = 'python "$(VIM_FILEPATH)"'
-	elseif &ft == 'javascript'
-		let cmd = 'node "$(VIM_FILEPATH)"'
-	elseif &ft == 'perl'
-		let cmd = 'perl "$(VIM_FILEPATH)"'
-	elseif &ft == 'ruby'
-		let cmd = 'ruby "$(VIM_FILEPATH)"'
-	elseif &ft == 'php'
-		let cmd = 'php "$(VIM_FILEPATH)"'
-	elseif &ft == 'lua'
-		let cmd = 'lua "$(VIM_FILEPATH)"'
-	elseif &ft == 'zsh'
-		let cmd = 'zsh "$(VIM_FILEPATH)"'
-	elseif &ft == 'ps1'
-		let cmd = 'powershell -file "$(VIM_FILEPATH)"'
-	elseif &ft == 'vbs'
-		let cmd = 'cscript -nologo "$(VIM_FILEPATH)"'
-	elseif &ft == 'sh'
-		let cmd = 'bash "$(VIM_FILEPATH)"'
-	else
-		return
-	endif
-	" Windows 下打开新的窗口 (-mode=4) 运行程序，其他系统在 quickfix 运行
-	" -raw: 输出内容直接显示到 quickfix window 不匹配 errorformat
-	" -save=2: 保存所有改动过的文件
-	" -cwd=$(VIM_FILEDIR): 运行初始化目录为文件所在目录
-	if has('win32') || has('win64')
-		exec 'AsyncRun -cwd=$(VIM_FILEDIR) -raw -save=2 -mode=4 '. cmd
-	else
-		exec 'AsyncRun -cwd=$(VIM_FILEDIR) -raw -save=2 -mode=0 '. cmd
-	endif
-endfunc
-
-
-
-"----------------------------------------------------------------------
-" F2 在项目目录下 Grep 光标下单词，默认 C/C++/Py/Js ，扩展名自己扩充
-" 支持 rg/grep/findstr ，其他类型可以自己扩充
-" 不是在当前目录 grep，而是会去到当前文件所属的项目目录 project root
-" 下面进行 grep，这样能方便的对相关项目进行搜索
-"----------------------------------------------------------------------
-if executable('rg')
-	noremap <silent><F2> :AsyncRun! -cwd=<root> rg -n --no-heading 
-				\ --color never -g *.h -g *.c* -g *.py -g *.js -g *.vim 
-				\ <C-R><C-W> "<root>" <cr>
-elseif has('win32') || has('win64')
-	noremap <silent><F2> :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>" 
-				\ "\%CD\%\*.h" "\%CD\%\*.c*" "\%CD\%\*.py" "\%CD\%\*.js"
-				\ "\%CD\%\*.vim"
-				\ <cr>
-else
-	noremap <silent><F2> :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W> 
-				\ --include='*.h' --include='*.c*' --include='*.py' 
-				\ --include='*.js' --include='*.vim'
-				\ '<root>' <cr>
-endif
-
-

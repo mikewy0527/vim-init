@@ -26,9 +26,6 @@ set autoindent
 " 打开 C/C++ 语言缩进优化
 set cindent
 
-" Windows 禁用 ALT 操作菜单（使得 ALT 可以用到 Vim里）
-set winaltkeys=no
-
 " 关闭自动换行
 set nowrap
 
@@ -58,19 +55,23 @@ set hlsearch
 " 查找输入时动态增量显示查找结果
 set incsearch
 
+if maparg('<C-L>', 'n') ==# ''
+    nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
+endif
+
 
 "----------------------------------------------------------------------
 " 编码设置
 "----------------------------------------------------------------------
 if has('multi_byte')
-	" 内部工作编码
-	set encoding=utf-8
+    " 内部工作编码
+    set encoding=utf-8
 
-	" 文件默认编码
-	set fileencoding=utf-8
+    " 文件默认编码
+    set fileencoding=utf-8
 
-	" 打开文件时自动尝试下面顺序的编码
-	set fileencodings=ucs-bom,utf-8,gbk,gb18030,big5,euc-jp,latin1
+    " 打开文件时自动尝试下面顺序的编码
+    set fileencodings=utf-8,gbk,gb18030,big5,euc-jp,latin1
 endif
 
 
@@ -78,16 +79,16 @@ endif
 " 允许 Vim 自带脚本根据文件类型自动设置缩进等
 "----------------------------------------------------------------------
 if has('autocmd')
-	filetype plugin indent on
+    filetype plugin indent on
 endif
 
 
 "----------------------------------------------------------------------
 " 语法高亮设置
 "----------------------------------------------------------------------
-if has('syntax')  
-	syntax enable 
-	syntax on 
+if has('syntax') && !exists('g:syntax_on')
+    syntax enable
+    syntax on
 endif
 
 
@@ -114,8 +115,7 @@ set lazyredraw
 set errorformat+=[%f:%l]\ ->\ %m,[%f:%l]:%m
 
 " 设置分隔符可视
-set listchars=tab:\|\ ,trail:.,extends:>,precedes:<
-
+set listchars=eol:$,tab:>-,nbsp:␣,trail:\.,precedes:>,extends:<
 
 " 设置 tags：当前文件所在目录往上向根目录搜索直到碰到 .tags 文件
 " 或者 Vim 当前目录包含 .tags 文件
@@ -127,6 +127,9 @@ set formatoptions+=m
 " 合并两行中文时，不在中间加空格
 set formatoptions+=B
 
+" Delete comment character when joining commented lines
+set formatoptions+=j
+
 " 文件换行符，默认使用 unix 换行符
 set ffs=unix,dos,mac
 
@@ -135,14 +138,14 @@ set ffs=unix,dos,mac
 " 设置代码折叠
 "----------------------------------------------------------------------
 if has('folding')
-	" 允许代码折叠
-	set foldenable
+    " 允许代码折叠
+    set foldenable
 
-	" 代码折叠默认使用缩进
-	set fdm=indent
+    " 代码折叠默认使用缩进
+    set fdm=indent
 
-	" 默认打开所有缩进
-	set foldlevel=99
+    " 默认打开所有缩进
+    set foldlevel=99
 endif
 
 
@@ -151,22 +154,22 @@ endif
 "----------------------------------------------------------------------
 set suffixes=.bak,~,.o,.h,.info,.swp,.obj,.pyc,.pyo,.egg-info,.class
 
+set wildignore+=.git/,.hg/,.svn/,.root/,.project/
+set wildignore+=.ropeproject/,__pycache__/,venv/,*.min.*,images/,img/,fonts/
 set wildignore=*.o,*.obj,*~,*.exe,*.a,*.pdb,*.lib "stuff to ignore when tab completing
-set wildignore+=*.so,*.dll,*.swp,*.egg,*.jar,*.class,*.pyc,*.pyo,*.bin,*.dex
+set wildignore+=*.so,*.dll,*.egg,*.jar,*.class,*.pyc,*.pyo,*.bin,*.dex
 set wildignore+=*.zip,*.7z,*.rar,*.gz,*.tar,*.gzip,*.bz2,*.tgz,*.xz    " MacOSX/Linux
-set wildignore+=*DS_Store*,*.ipch
-set wildignore+=*.gem
+set wildignore+=*DS_Store*,*.ipch,*.gem
 set wildignore+=*.png,*.jpg,*.gif,*.bmp,*.tga,*.pcx,*.ppm,*.img,*.iso
-set wildignore+=*.so,*.swp,*.zip,*/.Trash/**,*.pdf,*.dmg,*/.rbenv/**
-set wildignore+=*/.nx/**,*.app,*.git,.git
+set wildignore+=*.swo,*.swp,*/.Trash/**,*.dmg,*/.rbenv/**,*/.nx/**,*.git
 set wildignore+=*.wav,*.mp3,*.ogg,*.pcm
 set wildignore+=*.mht,*.suo,*.sdf,*.jnlp
 set wildignore+=*.chm,*.epub,*.pdf,*.mobi,*.ttf
 set wildignore+=*.mp4,*.avi,*.flv,*.mov,*.mkv,*.swf,*.swc
 set wildignore+=*.ppt,*.pptx,*.docx,*.xlt,*.xls,*.xlsx,*.odt,*.wps
-set wildignore+=*.msi,*.crx,*.deb,*.vfd,*.apk,*.ipa,*.bin,*.msu
+set wildignore+=*.msi,*.crx,*.deb,*.vfd,*.apk,*.ipa,*.msu,*.app
 set wildignore+=*.gba,*.sfc,*.078,*.nds,*.smd,*.smc
 set wildignore+=*.linux2,*.win32,*.darwin,*.freebsd,*.linux,*.android
+set wildignore+=*.mo,*.Po
 
-
-
+set wildignorecase
