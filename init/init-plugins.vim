@@ -536,8 +536,8 @@ if has_key(s:plugin_subgroup, 'tags')
     " 详细用法见：https://zhuanlan.zhihu.com/p/36279445
 
     " gutentags debug
-    "let g:gutentags_define_advanced_commands = 1
-    "let g:gutentags_trace                    = 1
+    " let g:gutentags_define_advanced_commands = 1
+    " let g:gutentags_trace                    = 1
 
     " 设定项目目录标志：除了 .git/.svn 外，还有 .root 文件
     let g:gutentags_project_root  = ['.root', '.git', '.svn', '.hg', '.project']
@@ -557,6 +557,15 @@ if has_key(s:plugin_subgroup, 'tags')
     " 如果有 ctags 可执行就允许动态生成 ctags 文件
     if executable('ctags')
         let g:gutentags_modules += ['ctags']
+ 
+        " 设置 ctags 的参数
+        let g:gutentags_ctags_extra_args = []
+        let g:gutentags_ctags_extra_args += ['--fields=+niazS', '--extras=+q']
+        let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+        let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+
+        " 使用 universal-ctags 的话需要下面这行，请反注释
+        let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
     endif
 
     " 如果有 gtags 可执行就允许动态生成 gtags 数据库
@@ -564,33 +573,23 @@ if has_key(s:plugin_subgroup, 'tags')
         let g:gutentags_modules += ['gtags_cscope']
     endif
 
-    " 设置 ctags 的参数
-    let g:gutentags_ctags_extra_args = []
-    let g:gutentags_ctags_extra_args += ['--explain']
-    let g:gutentags_ctags_extra_args += ['--fields=+niazS', '--extras=+q']
-    let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
-    let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
-
-    " 使用 universal-ctags 的话需要下面这行，请反注释
-    let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
-
     " 禁止 gutentags 自动链接 gtags 数据库
     let g:gutentags_auto_add_gtags_cscope = 0
 
     " gutentags_plus setting
     let g:gutentags_plus_switch = 1
-    " let g:gutentags_plus_nomap  = 1
+    let g:gutentags_plus_nomap  = 1
 
-    " noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
-    " noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
-    " noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
-    " noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
-    " noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
-    " noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-    " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
-    " noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
-    " noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
-    " noremap <silent> <leader>gz :GscopeFind z <C-R><C-W><cr>
+    noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
+    noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
+    noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
+    noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
+    noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
+    noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+    noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+    noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
+    noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+    noremap <silent> <leader>gz :GscopeFind z <C-R><C-W><cr>
 endif
 ".}}}2
 

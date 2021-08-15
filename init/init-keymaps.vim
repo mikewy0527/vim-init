@@ -429,6 +429,6 @@ function! QuickfixToggle(size, ...)
 endfunction
 ".}}}1
 
-nnoremap <F9> :call QuickfixToggle(6)<CR>
+nnoremap <leader>q :call QuickfixToggle(6)<CR>
 
 " vim: set fdl=0 fdm=marker:
