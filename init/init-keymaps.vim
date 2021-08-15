@@ -20,39 +20,8 @@
 " INSERT/COMMAND 模式下 Bash 式键映射
 " 函数定义参考 https://github.com/houtsnip/vim-emacscommandline
 "----------------------------------------------------------------------
-noremap! <C-a> <Home>
-inoremap <C-e> <End>
-noremap! <C-b> <Left>
-noremap! <C-f> <Right>
-inoremap <C-p> <Up>
-inoremap <C-n> <Down>
 
-" ALT+j/k 逻辑跳转下一行/上一行（按 wrap 逻辑换行进行跳转）
-nnoremap <M-j> gj
-nnoremap <M-k> gk
-inoremap <M-j> <C-\><C-o>gj
-inoremap <M-k> <C-\><C-o>gk
-
-inoremap <M-b> <S-Left>
-inoremap <M-f> <S-Right>
-cnoremap <M-b> <C-\>e <SID>BackwardWord()<CR>
-cnoremap <M-f> <C-\>e <SID>ForwardWord()<CR>
-
-" delete form cursor to line-end
-" In COMMAND mode, use custom function to make Yank and Undo work correctly
-inoremap <C-k> <C-\><C-o>D
-cnoremap <C-k> <C-\>e <SID>KillLine()<CR>
-cnoremap <C-u> <C-\>e <SID>BackwardKillLine()<CR>
-
-" delete-forward word
-inoremap <M-d> <C-\><C-o>dw
-cnoremap <M-d> <C-\>e <SID>KillWord()<CR>
-cnoremap <C-w> <C-\>e <SID>BackwardKillWord()<CR>
-
-cnoremap <C-y> <C-\>e <SID>Yank()<CR>
-cnoremap <C-_> <C-\>e <SID>Undo()<CR>
-
-
+" vim-emacscmdline function -----------------------------------------------{{{1
 if !exists('g:CmdlineMaxUndoHistory')
     let g:CmdlineMaxUndoHistory = 100
 endif
@@ -199,8 +168,42 @@ function! <SID>Undo()
     call remove(s:oldcmdline, 0)
     return l:ret
 endfunction
+".}}}1
+
+noremap! <C-a> <Home>
+inoremap <C-e> <End>
+noremap! <C-b> <Left>
+noremap! <C-f> <Right>
+inoremap <C-p> <Up>
+inoremap <C-n> <Down>
+
+" ALT+j/k 逻辑跳转下一行/上一行（按 wrap 逻辑换行进行跳转）
+nnoremap <M-j> gj
+nnoremap <M-k> gk
+inoremap <M-j> <C-\><C-o>gj
+inoremap <M-k> <C-\><C-o>gk
+
+inoremap <M-b> <S-Left>
+inoremap <M-f> <S-Right>
+cnoremap <M-b> <C-\>e <SID>BackwardWord()<CR>
+cnoremap <M-f> <C-\>e <SID>ForwardWord()<CR>
+
+" delete form cursor to line-end
+" In COMMAND mode, use custom function to make Yank and Undo work correctly
+inoremap <C-k> <C-\><C-o>D
+cnoremap <C-k> <C-\>e <SID>KillLine()<CR>
+cnoremap <C-u> <C-\>e <SID>BackwardKillLine()<CR>
+
+" delete-forward word
+inoremap <M-d> <C-\><C-o>dw
+cnoremap <M-d> <C-\>e <SID>KillWord()<CR>
+cnoremap <C-w> <C-\>e <SID>BackwardKillWord()<CR>
+
+cnoremap <C-y> <C-\>e <SID>Yank()<CR>
+cnoremap <C-_> <C-\>e <SID>Undo()<CR>
 
 
+" tabline switch tab keymap -----------------------------------------------{{{1
 "----------------------------------------------------------------------
 " <leader>+数字键 切换tab
 "----------------------------------------------------------------------
@@ -267,19 +270,27 @@ if has("gui_macvim")
     inoremap <silent><D-9> <ESC>:tabn 9<CR>
     inoremap <silent><D-0> <ESC>:tabn 10<CR>
 endif
-
-
-"----------------------------------------------------------------------
-" 缓存：插件 unimpaired 中定义了 [b, ]b 来切换缓存
-"----------------------------------------------------------------------
-" noremap <silent> <leader>bn :bn<cr>
-" noremap <silent> <leader>bp :bp<cr>
-
+".}}}1
 
 "----------------------------------------------------------------------
 " TAB：创建，关闭，上一个，下一个，左移，右移
 " 其实还可以用原生的 CTRL+PageUp, CTRL+PageDown 来切换标签
 "----------------------------------------------------------------------
+" tabline operation keymap ------------------------------------------------{{{1
+
+" Keep a list of the most recent two tabs.
+let g:tablist = [1, 1]
+
+augroup TabCloseFocusPrevgroup
+    autocmd!
+
+    autocmd TabLeave * let g:tablist[0] = g:tablist[1]
+    autocmd TabLeave * let g:tablist[1] = tabpagenr()
+    " When a tab is closed, return to the most recent tab.
+    " The way vim updates tabs, in reality, this means we must return
+    " to the second most recent tab.
+    autocmd TabClosed * exe "normal " . g:tablist[0] . "gt"
+augroup end
 
 noremap <silent> <leader>tc :tabnew<CR>
 noremap <silent> <leader>tq :tabclose<CR>
@@ -311,13 +322,14 @@ if has("gui_running")
     noremap <silent><M-Left> :call Tab_MoveLeft()<CR>
     noremap <silent><M-Right> :call Tab_MoveRight()<CR>
 endif
-
+".}}}1
 
 "----------------------------------------------------------------------
 " 窗口切换：ALT+SHIFT+hjkl
 " 传统的 CTRL+hjkl 移动窗口不适用于 vim 8.1 的终端模式，CTRL+hjkl 在
 " bash/zsh 及带文本界面的程序中都是重要键位需要保留，不能 tnoremap 的
 "----------------------------------------------------------------------
+" switch window keymap ----------------------------------------------------{{{1
 noremap <M-H> <C-w>h
 noremap <M-L> <C-w>l
 noremap <M-J> <C-w>j
@@ -367,3 +379,56 @@ elseif has('nvim')
     tnoremap <M-9> <C-\><C-n>9gt
     tnoremap <M-0> <C-\><C-n>10gt
 endif
+".}}}1
+
+"----------------------------------------------------------------------
+" 打开/关闭 quickfix window
+"----------------------------------------------------------------------
+" quickfix toggle function ------------------------------------------------{{{1
+function! QuickfixToggle(size, ...)
+    echo "call QuickfixToggle"
+    let l:mode = (a:0 == 0)? 2 : (a:1)
+    function! s:WindowCheck(mode)
+        if &buftype == 'quickfix'
+            let s:quickfix_open = 1
+            return
+        endif
+        if a:mode == 0
+            let w:quickfix_save = winsaveview()
+        else
+            if exists('w:quickfix_save')
+                call winrestview(w:quickfix_save)
+                unlet w:quickfix_save
+            endif
+        endif
+    endfunc
+
+    let s:quickfix_open = 0
+    let l:winnr = winnr()
+    keepalt noautocmd windo call s:WindowCheck(0)
+    keepalt noautocmd silent! exec ''.l:winnr.'wincmd w'
+    if l:mode == 0
+        if s:quickfix_open != 0
+            silent! cclose
+        endif
+    elseif l:mode == 1
+        if s:quickfix_open == 0
+            keepalt exec 'botright copen '. ((a:size > 0)? a:size : ' ')
+            keepalt wincmd k
+        endif
+    elseif l:mode == 2
+        if s:quickfix_open == 0
+            keepalt exec 'botright copen '. ((a:size > 0)? a:size : ' ')
+            keepalt wincmd k
+        else
+            silent! cclose
+        endif
+    endif
+    keepalt noautocmd windo call s:WindowCheck(1)
+    keepalt noautocmd silent! exec ''.l:winnr.'wincmd w'
+endfunction
+".}}}1
+
+nnoremap <F9> :call QuickfixToggle(6)<CR>
+
+" vim: set fdl=0 fdm=marker:
