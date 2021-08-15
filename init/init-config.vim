@@ -186,9 +186,6 @@ augroup InitFileTypesGroup
     " haskell 进行微调
     au FileType haskell setlocal et
 
-    " quickfix 隐藏行号
-    au FileType qf setlocal nonumber
-
     " 强制对某些扩展名的 filetype 进行纠正
     au BufNewFile,BufRead *.as setlocal filetype=actionscript
     au BufNewFile,BufRead *.pro setlocal filetype=prolog
@@ -197,10 +194,3 @@ augroup InitFileTypesGroup
     au BufNewFile,BufRead *.vl setlocal filetype=verilog
     au BufNewFile,BufRead *.sublime-* setlocal filetype=json
 augroup END
-
-let g:terminal_ansi_colors = [
-                \ "#232627", "#ba362a", "#19ca8c", "#e6ab45",
-                \ "#1d99f3", "#9b59b6", "#1abc9c", "#e6e6e6",
-                \ "#7f8c8d", "#f74782", "#10be13", "#ec6e00",
-                \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
-                \]

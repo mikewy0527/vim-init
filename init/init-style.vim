@@ -31,10 +31,6 @@ set signcolumn=yes
 " 右下角显示命令
 set showcmd
 
-" 插入模式在状态栏下面显示 -- INSERT --，
-" 先注释掉，默认已经为真了，如果这里再设置一遍会影响 echodoc 插件
-" set showmode
-
 " 水平切割窗口时，默认在右边显示新窗口
 set splitright
 
@@ -50,6 +46,33 @@ if exists('+termguicolors')
         let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
     endif
     set termguicolors
+endif
+
+if &termguicolors
+    if $KONSOLETHEME == 'Breath2-Light'
+        let g:terminal_ansi_colors = [
+                        \ "#dfdfdf", "#c0392b", "#44853a", "#f6a70a",
+                        \ "#1d99f3", "#9b59b6", "#1abc9c", "#f1f1f1",
+                        \ "#7f8c8d", "#f74782", "#55a649", "#f67400",
+                        \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
+                        \]
+    else
+        if $KONSOLETHEME == 'Breath2-Dark'
+            let g:terminal_ansi_colors = [
+                            \ "#1e2229", "#af4633", "#4c9947", "#b98537",
+                            \ "#1987d1", "#9b59b6", "#18b092", "#d3d3d3",
+                            \ "#7f8c8d", "#f74782", "#6c9947", "#ec6e00",
+                            \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
+                            \]
+        else
+            let g:terminal_ansi_colors = [
+                            \ "#232627", "#ba362a", "#10be13", "#e6ab45",
+                            \ "#1d99f3", "#9b59b6", "#1abc9c", "#e6e6e6",
+                            \ "#7f8c8d", "#f74782", "#19ca8c", "#ec6e00",
+                            \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
+                            \]
+        endif
+    endif
 endif
 
 " 设置黑色背景
