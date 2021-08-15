@@ -73,7 +73,9 @@ endif
 
 " textobj group -----------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'textobj')
-    let s:plugin_subgroup['to-indent']    = 1
+    " Use vim-init/plugin/indent-object.vim instead
+    " let s:plugin_subgroup['to-indent']    = 1
+
     let s:plugin_subgroup['to-syntax']    = 1
     let s:plugin_subgroup['to-function']  = 1
     let s:plugin_subgroup['to-parameter'] = 1
@@ -91,7 +93,7 @@ if has_key(g:bundle_group, 'developer')
     let s:plugin_subgroup['tags']         = 1
     let s:plugin_subgroup['preview']      = 1
     let s:plugin_subgroup['ale']          = 1
-    " let s:plugin_subgroup['echodoc']      = 1
+    let s:plugin_subgroup['echodoc']      = 1
     let s:plugin_subgroup['leaderf']      = 1
     let s:plugin_subgroup['ycm']          = 1
     let s:plugin_subgroup['snippets']     = 1
@@ -220,8 +222,7 @@ if has_key(g:bundle_group, 'textobj')
 
     if has_key(s:plugin_subgroup, 'to-indent')
         " indent 文本对象：ii/ai 表示当前缩进，vii 选中当缩进，cii 改写缩进
-        " Use vim-init/plugin/indent-object.vim instead
-        " Plug 'kana/vim-textobj-indent'
+        Plug 'kana/vim-textobj-indent'
     endif
 
     if has_key(s:plugin_subgroup, 'to-syntax')
@@ -231,7 +232,7 @@ if has_key(g:bundle_group, 'textobj')
 
     if has_key(s:plugin_subgroup, 'to-function')
         " 函数文本对象：if/af 支持 c/c++/vim/java
-        Plug 'kana/vim-textobj-function', { 'for':['c', 'cpp', 'vim', 'java'] }
+        Plug 'kana/vim-textobj-function', { 'for': ['c', 'cpp', 'vim', 'java'] }
     endif
 
     if has_key(s:plugin_subgroup, 'to-parameter')
@@ -241,7 +242,7 @@ if has_key(g:bundle_group, 'textobj')
 
     if has_key(s:plugin_subgroup, 'to-python')
         " 提供 python 相关文本对象，if/af 表示函数，ic/ac 表示类
-        Plug 'bps/vim-textobj-python', {'for': 'python'}
+        Plug 'bps/vim-textobj-python', { 'for': 'python' }
     endif
 
     if has_key(s:plugin_subgroup, 'to-uri')
@@ -289,7 +290,7 @@ if has_key(g:bundle_group, 'developer')
 
     if has_key(s:plugin_subgroup, 'ale')
         let g:ale_disable_lsp = 1
-        Plug 'dense-analysis/ale', {'for': ['c', 'cpp'], 'on': 'ALEToggle' }
+        Plug 'dense-analysis/ale', { 'for': ['c', 'cpp'], 'on': 'ALEToggle' }
     endif
 
     if has_key(s:plugin_subgroup, 'echodoc')
@@ -361,8 +362,6 @@ if has_key(s:plugin_subgroup, 'fern')
     " Custom settings and mappings.
     let g:fern#disable_default_mappings = 1
 
-    noremap <silent> <leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
-
     function! FernInit() abort
         nmap <buffer><expr>
             \ <Plug>(fern-my-open-expand-collapse)
@@ -405,10 +404,7 @@ if has_key(s:plugin_subgroup, 'fern')
         autocmd FileType fern call s:fern_settings()
     augroup END
 
-    " function! s:fern_settings() abort
-    "     nmap <silent> <buffer> <expr> <Plug>(fern-quit-or-close-preview) fern_preview#smart_preview("\<Plug>(fern-action-preview:close)", ":q\<CR>")
-    "     nmap <silent> <buffer> q <Plug>(fern-quit-or-close-preview)
-    " endfunction
+    noremap <silent> <leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 endif
 ".}}}2
 
@@ -570,7 +566,7 @@ if has_key(s:plugin_subgroup, 'tags')
 
     " 设置 ctags 的参数
     let g:gutentags_ctags_extra_args = []
-    "let g:gutentags_ctags_extra_args += ['--explain']
+    let g:gutentags_ctags_extra_args += ['--explain']
     let g:gutentags_ctags_extra_args += ['--fields=+niazS', '--extras=+q']
     let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
     let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
@@ -764,8 +760,8 @@ endif
 " echodoc -----------------------------------------------------------------{{{2
 " 搭配 YCM/deoplete 在底部显示函数参数
 if has_key(s:plugin_subgroup, 'echodoc')
-    "set noshowmode
-    "let g:echodoc#enable_at_startup = 1
+    set noshowmode
+    let g:echodoc#enable_at_startup = 1
 endif
 ".}}}2
 
