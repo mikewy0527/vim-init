@@ -119,12 +119,12 @@ if has_key(g:bundle_group, 'basic')
 
     if !s:is_logfile
         if has_key(s:plugin_subgroup, 'fern')
-            Plug 'lambdalisue/fern.vim'
-            Plug 'yuki-yano/fern-preview.vim'
+            Plug 'lambdalisue/fern.vim', { 'on': [] }
+            Plug 'yuki-yano/fern-preview.vim', { 'on': [] }
         endif
 
         if has_key(s:plugin_subgroup, 'barbaric')
-            Plug 'rlue/vim-barbaric'
+            Plug 'rlue/vim-barbaric', { 'on': [] }
         endif
     endif
 
@@ -151,7 +151,7 @@ endif
 if has_key(g:bundle_group, 'colortheme')
     if !s:is_logfile
         if has_key(s:plugin_subgroup, 'hexokinase')
-            Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+            Plug 'rrethy/vim-hexokinase', { 'for': ['css', 'html', 'javascript', 'vim'], 'do': 'make hexokinase' }
         endif
     endif
 
@@ -287,11 +287,11 @@ if has_key(g:bundle_group, 'developer')
         let $GTAGSCONF  = '/home/walt/.globalrc'
 
         " 提供 ctags/gtags 后台数据库自动更新功能
-        Plug 'ludovicchabant/vim-gutentags', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
+        Plug 'ludovicchabant/vim-gutentags', { 'on': [] }
 
         " 提供 GscopeFind 命令并自动处理好 gtags 数据库切换
         " 支持光标移动到符号名上：<leader>cg 查看定义，<leader>cs 查看引用
-        Plug 'skywind3000/gutentags_plus', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
+        Plug 'skywind3000/gutentags_plus', { 'on': [] }
     endif
 
     if has_key(s:plugin_subgroup, 'preview')
@@ -301,7 +301,8 @@ if has_key(g:bundle_group, 'developer')
 
     if has_key(s:plugin_subgroup, 'ale')
         let g:ale_disable_lsp = 1
-        Plug 'dense-analysis/ale', { 'on': 'ALEToggle', 'for': ['c', 'cpp'] }
+        " Plug 'dense-analysis/ale', { 'on': [], 'for': ['c', 'cpp'] }
+        Plug 'dense-analysis/ale', { 'on': [] }
     endif
 
     if has_key(s:plugin_subgroup, 'echodoc')
@@ -311,13 +312,7 @@ if has_key(g:bundle_group, 'developer')
     if has_key(s:plugin_subgroup, 'leaderf')
         " 如果 vim 支持 python 则启用  Leaderf
         if has('python') || has('python3')
-            Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
-        else
-            " 不支持 python ，使用 CtrlP 代替
-            Plug 'ctrlpvim/ctrlp.vim'
-
-            " 显示函数列表的扩展插件
-            Plug 'tacahiroy/ctrlp-funky'
+            Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension', 'on': [] }
         endif
     endif
 
@@ -326,8 +321,8 @@ if has_key(g:bundle_group, 'developer')
     endif
 
     if has_key(s:plugin_subgroup, 'snippets')
-        Plug 'SirVer/ultisnips', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
-        Plug 'honza/vim-snippets', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
+        Plug 'SirVer/ultisnips', { 'on': [] }
+        Plug 'honza/vim-snippets', { 'on': [] }
     endif
 endif
 ".}}}2
@@ -350,6 +345,17 @@ endif
 
 " fern --------------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'fern')
+    function! OndemandLoadFern()
+        if !s:is_logfile
+            call plug#load('fern.vim')
+            call plug#load('fern-preview.vim')
+        endif
+    endfunction
+
+    if maparg('<Leader>lf', 'n') ==# ''
+        nnoremap <Leader>lf :call OndemandLoadFern()<CR>
+    endif
+
     " Disable netrw.
     let g:loaded_netrw             = 1
     let g:loaded_netrwPlugin       = 1
@@ -450,12 +456,13 @@ endif
 " indentline --------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'indentline')
     function! s:vimplug_load_indentline()
-        if !b:is_logfile
+        if !s:is_logfile
             call plug#load('indentLine')
             autocmd! vimplug_load_indentline
             exec 'IndentLinesEnable'
         endif
     endfunction
+
     augroup vimplug_load_indentline
         au!
         au BufWinEnter * call s:vimplug_load_indentline()
@@ -514,6 +521,10 @@ endif
 " barbaric ----------------------------------------------------------------{{{2
 " Insert/Normal 中文输入自动切换
 if has_key(s:plugin_subgroup, 'barbaric')
+    function! OndemandLoadIMSwitcher()
+            call plug#load('vim-barbaric')
+    endfunction
+
     " The IME to invoke for managing input languages (macos, fcitx, ibus, xkb-switch)
     let g:barbaric_ime = 'fcitx'
 
@@ -522,6 +533,10 @@ if has_key(s:plugin_subgroup, 'barbaric')
 
     " The fcitx-remote binary (to distinguish between fcitx and fcitx5)
     let g:barbaric_fcitx_cmd = 'fcitx5-remote'
+
+    if maparg('<Leader>im', 'n') ==# ''
+        nnoremap <Leader>im :call OndemandLoadIMSwitcher()<CR>
+    endif
 endif
 ".}}}2
 
@@ -532,37 +547,35 @@ if has_key(s:plugin_subgroup, 'choosewin')
 endif
 ".}}}2
 
-" fugitive ----------------------------------------------------------------{{{2
+" fugitive and signify ----------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'fugitive')
-    function! s:vimplug_load_fugitive()
+    function! OndemandLoadFugitive()
         if system('git rev-parse --is-inside-work-tree') =~ 'true'
+            if exists('g:loaded_fugitive')
+                return
+            endif
+
             call plug#load('vim-fugitive')
-            autocmd! vimplug_load_fugitive
             call FugitiveDetect(expand('%:p'))
+
+            if has_key(s:plugin_subgroup, 'signify')
+                call plug#load('vim-signify')
+                call sy#start()
+            endif
+
+            call lightline#disable()
+            call lightline#enable()
         endif
     endfunction
-    augroup vimplug_load_fugitive
-        au!
-        au BufWinEnter * call s:vimplug_load_fugitive()
-    augroup END
-endif
-".}}}2
 
-" signify -----------------------------------------------------------------{{{2
+    if maparg('<Leader><F5>', 'n') ==# ''
+        nnoremap <Leader><F5> :call OndemandLoadFugitive()<CR>
+    endif
+endif
+
 if has_key(s:plugin_subgroup, 'signify')
     " signify 调优
     set updatetime=100
-    function! s:vimplug_load_signify()
-        if system('git rev-parse --is-inside-work-tree') =~ 'true'
-            call plug#load('vim-signify')
-            autocmd! vimplug_load_signify
-            call sy#start()
-        endif
-    endfunction
-    augroup vimplug_load_signify
-        au!
-        au BufWinEnter * call s:vimplug_load_signify()
-    augroup END
 
     let g:signify_vcs_list               = ['git', 'svn']
     let g:signify_sign_add               = '+'
@@ -575,13 +588,20 @@ if has_key(s:plugin_subgroup, 'signify')
     let g:signify_vcs_cmds = {
             \ 'git': 'git diff --no-color --diff-algorithm=histogram --no-ext-diff -U0 -- %f',
         \}
-
-    "nnoremap <leader>tgg :GitGutterToggle<CR>
 endif
 ".}}}2
 
 " ctags/gtags -------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'tags')
+    function! OndemandLoadGtags()
+        call plug#load('vim-gutentags')
+        call plug#load('gutentags_plus')
+    endfunction
+
+    if maparg('<Leader>lg', 'n') ==# ''
+        nnoremap <Leader>lg :call OndemandLoadGtags()<CR>
+    endif
+
     " 自动生成 ctags/gtags，并提供自动索引功能
     " 不在 git/svn 内的项目，需要在项目根目录 touch 一个空的 .root 文件
     " 详细用法见：https://zhuanlan.zhihu.com/p/36279445
@@ -715,6 +735,15 @@ endif
 
 " ale ---------------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'ale')
+    function! OndemandLoadALE()
+        if !exists('g:ale_enabled')
+            call plug#load('ale')
+            let g:ale_enabled = 0
+            exec 'ALEToggle'
+        endif
+        exec 'ALEToggle'
+    endfunction
+
     let g:ale_lint_on_enter      = 0
     let g:ale_linters_explicit   = 1
     let g:ale_hover_to_preview   = 1
@@ -803,7 +832,9 @@ if has_key(s:plugin_subgroup, 'ale')
     let g:ale_linters.text          = ['textlint', 'write-good', 'languagetool']
     let g:ale_sh_shellcheck_options = '-x'
 
-    noremap <F6> :ALEToggle<CR>
+    if maparg('<Leader><F6>', 'n') ==# ''
+        nnoremap <Leader><F6> :call OndemandLoadALE()<CR>
+    endif
 endif
 ".}}}2
 
@@ -1020,6 +1051,15 @@ endif
 
 " snippets ---------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'snippets')
+    function! OndemandLoadSnippets()
+        call plug#load('ultisnips')
+        call plug#load('vim-snippets')
+    endfunction
+
+    if maparg('<Leader>lu', 'n') ==# ''
+        nnoremap <Leader>lu :call OndemandLoadSnippets()<CR>
+    endif
+
     function! g:UltiSnips_Complete()
         call UltiSnips#ExpandSnippet()
         if g:ulti_expand_res == 0
