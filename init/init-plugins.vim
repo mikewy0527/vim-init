@@ -22,13 +22,17 @@ endfunc
 " 插件分组 ----------------------------------------------------------------{{{1
 let g:bundle_group    = {}
 let s:plugin_subgroup = {}
+let s:is_logfile = $filetype =~ 'messages' || expand('%:e') =~ 'log'
 
 let g:bundle_group['basic']      = 1
 let g:bundle_group['colortheme'] = 1
-let g:bundle_group['editor']     = 1
-let g:bundle_group['ft_enhance'] = 1
-let g:bundle_group['textobj']    = 1
-let g:bundle_group['developer']  = 1
+
+if !s:is_logfile
+    let g:bundle_group['editor']     = 1
+    let g:bundle_group['ft_enhance'] = 1
+    let g:bundle_group['textobj']    = 1
+    let g:bundle_group['developer']  = 1
+endif
 
 " basic group -------------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'basic')
@@ -36,7 +40,7 @@ if has_key(g:bundle_group, 'basic')
     let s:plugin_subgroup['fern']       = 1
     let s:plugin_subgroup['commentary'] = 1
     let s:plugin_subgroup['barbaric']   = 1
-    let s:plugin_subgroup['easymotion'] = 1
+    let s:plugin_subgroup['motion']     = 1
     let s:plugin_subgroup['choosewin']  = 1
 endif
 ".}}}2
@@ -44,8 +48,8 @@ endif
 " colortheme group --------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'colortheme')
     let s:plugin_subgroup['hexokinase'] = 1
-    let s:plugin_subgroup['airline']    = 1
-    " let s:plugin_subgroup['lightline']  = 1
+    " let s:plugin_subgroup['airline']    = 1
+    let s:plugin_subgroup['lightline']  = 1
 endif
 ".}}}2
 
@@ -86,7 +90,6 @@ endif
 
 " developer group ----------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'developer')
-    let s:plugin_subgroup['indentline']   = 1
     let s:plugin_subgroup['editorconfig'] = 1
     let s:plugin_subgroup['fugitive']     = 1
     let s:plugin_subgroup['signify']      = 1
@@ -107,28 +110,34 @@ call plug#begin(get(g:, 'bundle_home', '~/.vim/bundles'))
 " basic group -------------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'basic')
     if has_key(s:plugin_subgroup, 'one')
-        " Use the fork for better performance than 'rakr/vim-one', but have bug in switch color theme
-        Plug 'mikewy0527/vim-one'
-        " Plug 'joshdick/onedark.vim'
+        if !g:disable_all_plugin
+            " Use the fork for better performance than 'rakr/vim-one', but have bug in switch color theme
+            Plug 'mikewy0527/vim-one'
+            " Plug 'joshdick/onedark.vim'
+        endif
     endif
 
-    if has_key(s:plugin_subgroup, 'fern')
-        Plug 'lambdalisue/fern.vim'
-        Plug 'yuki-yano/fern-preview.vim'
+    if !s:is_logfile
+        if has_key(s:plugin_subgroup, 'fern')
+            Plug 'lambdalisue/fern.vim'
+            Plug 'yuki-yano/fern-preview.vim'
+        endif
+
+        if has_key(s:plugin_subgroup, 'barbaric')
+            Plug 'rlue/vim-barbaric'
+        endif
     endif
 
     if has_key(s:plugin_subgroup, 'commentary')
         Plug 'tpope/vim-commentary'
     endif
 
-    if has_key(s:plugin_subgroup, 'barbaric')
-        Plug 'rlue/vim-barbaric'
-    endif
-
-    if has_key(s:plugin_subgroup, 'easymotion')
+    if has_key(s:plugin_subgroup, 'motion')
         " 全文快速移动，<leader><leader>f{char} 即可触发
-        " alternative: Plug 'justinmk/vim-sneak'
-        Plug 'easymotion/vim-easymotion'
+        " Plug 'easymotion/vim-easymotion'
+
+        " alternative
+        Plug 'justinmk/vim-sneak'
     endif
 
     if has_key(s:plugin_subgroup, 'choosewin')
@@ -140,8 +149,10 @@ endif
 
 " colortheme group --------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'colortheme')
-    if has_key(s:plugin_subgroup, 'hexokinase')
-        Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+    if !s:is_logfile
+        if has_key(s:plugin_subgroup, 'hexokinase')
+            Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+        endif
     endif
 
     if has_key(s:plugin_subgroup, 'airline')
@@ -151,12 +162,17 @@ if has_key(g:bundle_group, 'colortheme')
 
     if has_key(s:plugin_subgroup, 'lightline')
         Plug 'itchyny/lightline.vim'
+        Plug 'ntpeters/vim-better-whitespace'
     endif
 endif
 ".}}}2
 
 " editor group ------------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'editor')
+    if has_key(s:plugin_subgroup, 'indentline')
+        Plug 'Yggdroot/indentLine', { 'on': [] }
+    endif
+
     if has_key(s:plugin_subgroup, 'tabular')
         Plug 'godlygeek/tabular', { 'on': 'Tabularize', 'for': ['markdown', 'conf', 'config', 'text'] }
     endif
@@ -166,7 +182,7 @@ if has_key(g:bundle_group, 'editor')
     endif
 
     if has_key(s:plugin_subgroup, 'sleuth')
-        Plug 'tpope/vim-sleuth'
+        Plug 'tpope/vim-sleuth', { 'for': ['c', 'cpp', 'python', 'rust', 'go', 'sh', 'bash', 'vim', 'conf', 'config', 'markdown'] }
     endif
 
     if has_key(s:plugin_subgroup, 'repeat')
@@ -178,7 +194,7 @@ if has_key(g:bundle_group, 'editor')
     endif
 
     if has_key(s:plugin_subgroup, 'matchup')
-        Plug 'andymass/vim-matchup'
+        Plug 'andymass/vim-matchup', { 'for': ['c', 'cpp', 'python', 'go', 'rust', 'sh', 'bash', 'make', 'cmake', 'json'] }
     endif
 
     if has_key(s:plugin_subgroup, 'unimpaired')
@@ -194,55 +210,54 @@ endif
 " filetype group ----------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'ft_enhance')
     if has_key(s:plugin_subgroup, 'cpp-enhance-hi')
-        Plug 'mikewy0527/vim-cpp-enhanced-highlight', { 'for': ['c', 'cpp'] }
+        Plug 'mikewy0527/vim-cpp-enhanced-highlight', { 'on': [], 'for': ['c', 'cpp'] }
     endif
 
     if has_key(s:plugin_subgroup, 'pysynenhance')
         " python 语法文件增强
-        Plug 'vim-python/python-syntax', { 'for': ['python'] }
+        Plug 'vim-python/python-syntax', { 'on': [], 'for': ['python'] }
     endif
 
     if has_key(s:plugin_subgroup, 'rustsynenhance')
         " rust 语法增强
-        Plug 'rust-lang/rust.vim', { 'for': 'rust' }
+        Plug 'rust-lang/rust.vim', { 'on': [], 'for': 'rust' }
     endif
 
     if has_key(s:plugin_subgroup, 'orgmode')
         " vim org-mode
-        Plug 'jceb/vim-orgmode', { 'for': 'org' }
+        Plug 'jceb/vim-orgmode', { 'on': [], 'for': 'org' }
     endif
 endif
 ".}}}2
 
 " textobj group -----------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'textobj')
-
     " 基础插件：提供让用户方便的自定义文本对象的接口
     Plug 'kana/vim-textobj-user'
 
     if has_key(s:plugin_subgroup, 'to-indent')
         " indent 文本对象：ii/ai 表示当前缩进，vii 选中当缩进，cii 改写缩进
-        Plug 'kana/vim-textobj-indent'
+        Plug 'kana/vim-textobj-indent', { 'on': [], 'for': ['c', 'cpp', 'java', 'python', 'go', 'sh', 'bash'] }
     endif
 
     if has_key(s:plugin_subgroup, 'to-syntax')
         " 语法文本对象：iy/ay 基于语法的文本对象
-        Plug 'kana/vim-textobj-syntax'
+        Plug 'kana/vim-textobj-syntax', { 'on': [], 'for': ['c', 'cpp', 'java'] }
     endif
 
     if has_key(s:plugin_subgroup, 'to-function')
         " 函数文本对象：if/af 支持 c/c++/vim/java
-        Plug 'kana/vim-textobj-function', { 'for': ['c', 'cpp', 'vim', 'java'] }
+        Plug 'kana/vim-textobj-function', { 'on': [], 'for': ['c', 'cpp', 'java'] }
     endif
 
     if has_key(s:plugin_subgroup, 'to-parameter')
         " 参数文本对象：i,/a, 包括参数或者列表元素
-        Plug 'sgur/vim-textobj-parameter'
+        Plug 'sgur/vim-textobj-parameter', { 'on': [], 'for': ['c', 'cpp', 'java'] }
     endif
 
     if has_key(s:plugin_subgroup, 'to-python')
         " 提供 python 相关文本对象，if/af 表示函数，ic/ac 表示类
-        Plug 'bps/vim-textobj-python', { 'for': 'python' }
+        Plug 'bps/vim-textobj-python', { 'on': [], 'for': 'python' }
     endif
 
     if has_key(s:plugin_subgroup, 'to-uri')
@@ -254,17 +269,13 @@ endif
 
 " developer group ---------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'developer')
-    if has_key(s:plugin_subgroup, 'indentline')
-        Plug 'Yggdroot/indentLine'
-    endif
-
     if has_key(s:plugin_subgroup, 'fugitive')
-        Plug 'tpope/vim-fugitive'
+        Plug 'tpope/vim-fugitive', { 'on': [] }
     endif
 
     if has_key(s:plugin_subgroup, 'signify')
         " 用于在侧边符号栏显示 git/svn 的 diff, alternative of 'airblade/vim-gitgutter'
-        Plug 'mhinz/vim-signify'
+        Plug 'mhinz/vim-signify', { 'on': [] }
     endif
 
     if has_key(s:plugin_subgroup, 'tags')
@@ -276,25 +287,25 @@ if has_key(g:bundle_group, 'developer')
         let $GTAGSCONF  = '/home/walt/.globalrc'
 
         " 提供 ctags/gtags 后台数据库自动更新功能
-        Plug 'ludovicchabant/vim-gutentags'
+        Plug 'ludovicchabant/vim-gutentags', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
 
         " 提供 GscopeFind 命令并自动处理好 gtags 数据库切换
         " 支持光标移动到符号名上：<leader>cg 查看定义，<leader>cs 查看引用
-        Plug 'skywind3000/gutentags_plus'
+        Plug 'skywind3000/gutentags_plus', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
     endif
 
     if has_key(s:plugin_subgroup, 'preview')
         " 提供基于 TAGS 的定义预览，函数参数预览，quickfix 预览
-        Plug 'skywind3000/vim-preview'
+        Plug 'skywind3000/vim-preview', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
     endif
 
     if has_key(s:plugin_subgroup, 'ale')
         let g:ale_disable_lsp = 1
-        Plug 'dense-analysis/ale', { 'for': ['c', 'cpp'], 'on': 'ALEToggle' }
+        Plug 'dense-analysis/ale', { 'on': 'ALEToggle', 'for': ['c', 'cpp'] }
     endif
 
     if has_key(s:plugin_subgroup, 'echodoc')
-        Plug 'Shougo/echodoc.vim'
+        Plug 'Shougo/echodoc.vim', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
     endif
 
     if has_key(s:plugin_subgroup, 'leaderf')
@@ -315,8 +326,8 @@ if has_key(g:bundle_group, 'developer')
     endif
 
     if has_key(s:plugin_subgroup, 'snippets')
-        Plug 'SirVer/ultisnips'
-        Plug 'honza/vim-snippets'
+        Plug 'SirVer/ultisnips', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
+        Plug 'honza/vim-snippets', { 'on': [], 'for': ['c', 'cpp', 'python', 'go', 'rust'] }
     endif
 endif
 ".}}}2
@@ -329,7 +340,7 @@ call plug#end()
 
 " commentary --------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'commentary')
-    augroup mygroup_commentary
+    augroup vimplug_load_commentary
         au!
 
         autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
@@ -391,12 +402,12 @@ if has_key(s:plugin_subgroup, 'fern')
     augroup END
 
     function! s:fern_settings() abort
-        nmap <silent> <buffer> p     <Plug>(fern-action-preview:toggle)
-        nmap <silent> <buffer> <C-p> <Plug>(fern-action-preview:auto:toggle)
-        nmap <silent> <buffer> <C-d> <Plug>(fern-action-preview:scroll:down:half)
-        nmap <silent> <buffer> <C-u> <Plug>(fern-action-preview:scroll:up:half)
+        nmap <silent> <buffer> p      <Plug>(fern-action-preview:toggle)
+        nmap <silent> <buffer> <C-p>  <Plug>(fern-action-preview:auto:toggle)
+        nmap <silent> <buffer> <C-d>  <Plug>(fern-action-preview:scroll:down:half)
+        nmap <silent> <buffer> <C-u>  <Plug>(fern-action-preview:scroll:up:half)
         nmap <silent> <buffer> <expr> <Plug>(fern-quit-or-close-preview) fern_preview#smart_preview("\<Plug>(fern-action-preview:close)", ":q\<CR>")
-        nmap <silent> <buffer> q <Plug>(fern-quit-or-close-preview)
+        nmap <silent> <buffer> q      <Plug>(fern-quit-or-close-preview)
     endfunction
 
     augroup fern-settings
@@ -422,6 +433,12 @@ if has_key(s:plugin_subgroup, 'cpp-enhance-hi')
 endif
 ".}}}2
 
+" sneak -------------------------------------------------------------------{{{2
+if has_key(s:plugin_subgroup, 'sneak')
+    let g:sneak#label = 1
+endif
+".}}}2
+
 " hexokinase --------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'hexokinase')
     let g:Hexokinase_highlighters  = [ 'backgroundfull' ]
@@ -432,6 +449,18 @@ endif
 
 " indentline --------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'indentline')
+    function! s:vimplug_load_indentline()
+        if !b:is_logfile
+            call plug#load('indentLine')
+            autocmd! vimplug_load_indentline
+            exec 'IndentLinesEnable'
+        endif
+    endfunction
+    augroup vimplug_load_indentline
+        au!
+        au BufWinEnter * call s:vimplug_load_indentline()
+    augroup END
+
     let g:indentLine_enabled             = 0
     let g:indentLine_leadingSpaceEnabled = 0
     " let g:indentLine_color_term          = 8
@@ -505,6 +534,17 @@ endif
 
 " fugitive ----------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'fugitive')
+    function! s:vimplug_load_fugitive()
+        if system('git rev-parse --is-inside-work-tree') =~ 'true'
+            call plug#load('vim-fugitive')
+            autocmd! vimplug_load_fugitive
+            call FugitiveDetect(expand('%:p'))
+        endif
+    endfunction
+    augroup vimplug_load_fugitive
+        au!
+        au BufWinEnter * call s:vimplug_load_fugitive()
+    augroup END
 endif
 ".}}}2
 
@@ -512,6 +552,17 @@ endif
 if has_key(s:plugin_subgroup, 'signify')
     " signify 调优
     set updatetime=100
+    function! s:vimplug_load_signify()
+        if system('git rev-parse --is-inside-work-tree') =~ 'true'
+            call plug#load('vim-signify')
+            autocmd! vimplug_load_signify
+            call sy#start()
+        endif
+    endfunction
+    augroup vimplug_load_signify
+        au!
+        au BufWinEnter * call s:vimplug_load_signify()
+    augroup END
 
     let g:signify_vcs_list               = ['git', 'svn']
     let g:signify_sign_add               = '+'
@@ -557,7 +608,7 @@ if has_key(s:plugin_subgroup, 'tags')
     " 如果有 ctags 可执行就允许动态生成 ctags 文件
     if executable('ctags')
         let g:gutentags_modules += ['ctags']
- 
+
         " 设置 ctags 的参数
         let g:gutentags_ctags_extra_args = []
         let g:gutentags_ctags_extra_args += ['--fields=+niazS', '--extras=+q']
@@ -600,7 +651,7 @@ if has_key(s:plugin_subgroup, 'preview')
     inoremap <m-u> <c-\><c-o>:PreviewScroll -1<cr>
     inoremap <m-d> <c-\><c-o>:PreviewScroll +1<cr>
 
-    augroup mygroup_vimpreview
+    augroup vimplug_load_vimpreview
         " Clear all existing autocommands in this group
         autocmd!
 
@@ -869,7 +920,7 @@ if has_key(s:plugin_subgroup, 'ycm')
             call plug#load('YouCompleteMe') | call youcompleteme#Enable()
         endif
     endfunction
-    augroup mygroup_ycm
+    augroup vimplug_load_ycm
         autocmd!
 
         autocmd BufWinEnter * call timer_start(1, {id->execute('call LazyLoadingYMC()')} )

@@ -31,20 +31,27 @@ set rtp+=~/.vim
 " 模块加载
 "----------------------------------------------------------------------
 
-" 加载基础配置
-LoadScript init/init-basic.vim
+let g:disable_all_plugin = 1
+let g:logfile_loadplug_size_limit = 30000000
 
-" 加载扩展配置
-LoadScript init/init-config.vim
+if ($filetype !~ 'messages' && expand('%:e') !~ 'log') || getfsize('%') <= g:logfile_loadplug_size_limit
+	let g:disable_all_plugin = 0
 
-" 设定 tabsize
-LoadScript init/init-tabsize.vim
+	" 加载基础配置
+	LoadScript init/init-basic.vim
 
-" 插件加载
-LoadScript init/init-plugins.vim
+	" 加载扩展配置
+	LoadScript init/init-config.vim
 
-" 界面样式
-LoadScript init/init-style.vim
+	" 设定 tabsize
+	LoadScript init/init-tabsize.vim
 
-" 自定义按键
-LoadScript init/init-keymaps.vim
+	" 插件加载
+	LoadScript init/init-plugins.vim
+
+	" 界面样式
+	LoadScript init/init-style.vim
+
+	" 自定义按键
+	LoadScript init/init-keymaps.vim
+endif
