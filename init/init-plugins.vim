@@ -55,7 +55,7 @@ endif
 
 " editor group ------------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'editor')
-    let s:plugin_subgroup['indentline']   = 1
+    " let s:plugin_subgroup['indentline']   = 1
     let s:plugin_subgroup['sleuth']       = 1
     let s:plugin_subgroup['tabular']      = 1
     let s:plugin_subgroup['repeat']       = 1
@@ -113,7 +113,6 @@ if has_key(g:bundle_group, 'basic')
         if !g:disable_all_plugin
             " Use the fork for better performance than 'rakr/vim-one', but have bug in switch color theme
             Plug 'mikewy0527/vim-one'
-            " Plug 'joshdick/onedark.vim'
         endif
     endif
 
@@ -162,7 +161,7 @@ if has_key(g:bundle_group, 'colortheme')
 
     if has_key(s:plugin_subgroup, 'lightline')
         Plug 'itchyny/lightline.vim'
-        Plug 'ntpeters/vim-better-whitespace'
+        Plug 'deponian/vim-lightline-whitespace'
     endif
 endif
 ".}}}2
@@ -182,7 +181,7 @@ if has_key(g:bundle_group, 'editor')
     endif
 
     if has_key(s:plugin_subgroup, 'sleuth')
-        Plug 'tpope/vim-sleuth', { 'for': ['c', 'cpp', 'python', 'rust', 'go', 'sh', 'bash', 'vim', 'conf', 'config', 'markdown'] }
+        Plug 'mikewy0527/vim-sleuth'
     endif
 
     if has_key(s:plugin_subgroup, 'repeat')
@@ -194,7 +193,7 @@ if has_key(g:bundle_group, 'editor')
     endif
 
     if has_key(s:plugin_subgroup, 'matchup')
-        Plug 'andymass/vim-matchup', { 'for': ['c', 'cpp', 'python', 'go', 'rust', 'sh', 'bash', 'make', 'cmake', 'json'] }
+        Plug 'andymass/vim-matchup', { 'for': ['c', 'cpp', 'python', 'go', 'rust', 'sh', 'bash', 'make', 'cmake', 'json', 'vim'] }
     endif
 
     if has_key(s:plugin_subgroup, 'unimpaired')
@@ -237,27 +236,27 @@ if has_key(g:bundle_group, 'textobj')
 
     if has_key(s:plugin_subgroup, 'to-indent')
         " indent 文本对象：ii/ai 表示当前缩进，vii 选中当缩进，cii 改写缩进
-        Plug 'kana/vim-textobj-indent', { 'on': [], 'for': ['c', 'cpp', 'java', 'python', 'go', 'sh', 'bash'] }
+        Plug 'kana/vim-textobj-indent'
     endif
 
     if has_key(s:plugin_subgroup, 'to-syntax')
         " 语法文本对象：iy/ay 基于语法的文本对象
-        Plug 'kana/vim-textobj-syntax', { 'on': [], 'for': ['c', 'cpp', 'java'] }
+        Plug 'kana/vim-textobj-syntax'
     endif
 
     if has_key(s:plugin_subgroup, 'to-function')
         " 函数文本对象：if/af 支持 c/c++/vim/java
-        Plug 'kana/vim-textobj-function', { 'on': [], 'for': ['c', 'cpp', 'java'] }
+        Plug 'kana/vim-textobj-function'
     endif
 
     if has_key(s:plugin_subgroup, 'to-parameter')
         " 参数文本对象：i,/a, 包括参数或者列表元素
-        Plug 'sgur/vim-textobj-parameter', { 'on': [], 'for': ['c', 'cpp', 'java'] }
+        Plug 'sgur/vim-textobj-parameter'
     endif
 
     if has_key(s:plugin_subgroup, 'to-python')
         " 提供 python 相关文本对象，if/af 表示函数，ic/ac 表示类
-        Plug 'bps/vim-textobj-python', { 'on': [], 'for': 'python' }
+        Plug 'bps/vim-textobj-python', { 'for': 'python' }
     endif
 
     if has_key(s:plugin_subgroup, 'to-uri')
@@ -336,7 +335,7 @@ call plug#end()
 " commentary --------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'commentary')
     augroup vimplug_load_commentary
-        au!
+        autocmd!
 
         autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
     augroup end
@@ -425,6 +424,13 @@ if has_key(s:plugin_subgroup, 'fern')
 endif
 ".}}}2
 
+" sleuth ------------------------------------------------------------------{{{2
+if has_key(s:plugin_subgroup, 'sleuth')
+    let g:sleuth_neighbor_limit    = 7
+    let g:sleuth_buf_max_readlines = 256
+endif
+".}}}2
+
 " cpp-enhance-highlight ---------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'cpp-enhance-hi')
     let g:cpp_no_function_highlight                  = 0
@@ -464,11 +470,11 @@ if has_key(s:plugin_subgroup, 'indentline')
     endfunction
 
     augroup vimplug_load_indentline
-        au!
-        au BufWinEnter * call s:vimplug_load_indentline()
+        autocmd!
+        autocmd BufWinEnter * call s:vimplug_load_indentline()
     augroup END
 
-    let g:indentLine_enabled             = 0
+    let g:indentLine_enabled             = 1
     let g:indentLine_leadingSpaceEnabled = 0
     " let g:indentLine_color_term          = 8
 
@@ -684,6 +690,16 @@ if has_key(s:plugin_subgroup, 'preview')
 endif
 ".}}}2
 
+" matchup -----------------------------------------------------------------{{{2
+if has_key(s:plugin_subgroup, 'matchup')
+    let g:matchup_motion_enabled = 0
+    let g:matchup_text_obj_enabled = 0
+    let g:matchup_delim_noskips = 2
+    let g:matchup_matchparen_deferred = 1
+    let g:matchup_matchparen_offscreen = { 'method': 'popup' }
+endif
+".}}}2
+
 " airline -----------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'airline')
     let g:airline_symbols_ascii                   = 1
@@ -706,17 +722,29 @@ endif
 " lightline ---------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'lightline')
     let g:lightline = {
-        \ 'colorscheme': 'one',
+        \   'colorscheme': 'one',
         \   'active': {
         \     'left': [
         \       ['mode', 'paste'],
         \       ['gitbranch', 'readonly', 'filename', 'modified']
+        \     ],
+        \     'right': [
+        \       [ 'lineinfo' ],
+        \       [ 'percent' ],
+        \       [ 'fileformat', 'fileencoding', 'filetype' ],
+        \       [ 'whitespace' ]
         \     ]
         \   },
         \   'component_function': {
         \     'gitbranch': 'fugitive#head',
-        \     'filename' : 'LightlineFilename',
+        \     'filename' : 'LightlineFilename'
         \   },
+        \   'component_expand': {
+        \     'whitespace': 'lightline#whitespace#check'
+        \   },
+        \   'component_type': {
+        \     'whitespace': 'warning'
+        \   }
         \ }
 
     let s:palette = g:lightline#colorscheme#{g:lightline.colorscheme}#palette
@@ -730,6 +758,9 @@ if has_key(s:plugin_subgroup, 'lightline')
         endif
         return substitute(s:path, $HOME, "~", "")
     endfunction
+
+    let g:whitespace#skip_check_ft = {'make': ['mixed', 'inconsistent']}
+    let g:whitespace#c_like_langs = [ 'arduino', 'c', 'cpp', 'cuda', 'go', 'javascript', 'ld', 'php' ]
 endif
 ".}}}2
 
@@ -1097,8 +1128,8 @@ if has_key(s:plugin_subgroup, 'snippets')
         let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
     endif
 
-    au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-    au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
+    autocmd InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+    autocmd InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
 endif
 ".}}}2
 ".}}}1
