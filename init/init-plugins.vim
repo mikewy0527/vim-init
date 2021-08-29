@@ -408,9 +408,9 @@ if has_key(s:plugin_subgroup, 'fern')
 
     function! s:fern_settings() abort
         nmap <silent> <buffer> p      <Plug>(fern-action-preview:toggle)
-        nmap <silent> <buffer> <C-p>  <Plug>(fern-action-preview:auto:toggle)
-        nmap <silent> <buffer> <C-d>  <Plug>(fern-action-preview:scroll:down:half)
-        nmap <silent> <buffer> <C-u>  <Plug>(fern-action-preview:scroll:up:half)
+        nmap <silent> <buffer> <M-p>  <Plug>(fern-action-preview:auto:toggle)
+        nmap <silent> <buffer> <M-d>  <Plug>(fern-action-preview:scroll:down:half)
+        nmap <silent> <buffer> <M-u>  <Plug>(fern-action-preview:scroll:up:half)
         nmap <silent> <buffer> <expr> <Plug>(fern-quit-or-close-preview) fern_preview#smart_preview("\<Plug>(fern-action-preview:close)", ":q\<CR>")
         nmap <silent> <buffer> q      <Plug>(fern-quit-or-close-preview)
     endfunction
