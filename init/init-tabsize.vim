@@ -27,8 +27,8 @@ set softtabstop=4
 set shiftwidth=4
 
 augroup PythonTab
-    au!
+    autocmd!
     " 如果你需要 python 里用 tab，那么反注释下面这行字，否则vim会在打开py文件
     " 时自动设置成空格缩进。
-    "au FileType python setlocal shiftwidth=4 tabstop=4 noexpandtab
+    "autocmd FileType python setlocal shiftwidth=4 tabstop=4 noexpandtab
 augroup END

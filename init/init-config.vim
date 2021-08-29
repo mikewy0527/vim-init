@@ -169,31 +169,31 @@ endif
 "----------------------------------------------------------------------
 augroup InitFileTypesGroup
     " 清除同组的历史 autocommand
-    au!
+    autocmd!
 
     " C/C++ 文件使用 // 作为注释
-    au FileType c,cpp setlocal commentstring=//\ %s
+    autocmd FileType c,cpp setlocal commentstring=//\ %s
 
     " Correct commenting on .Xdefaults and .Xresources
-    au FileType xdefaults setlocal commentstring=!\ %s
+    autocmd FileType xdefaults setlocal commentstring=!\ %s
 
     " markdown 允许自动换行
-    au FileType markdown setlocal wrap
+    autocmd FileType markdown setlocal wrap
 
     " lisp 进行微调
-    au FileType lisp setlocal ts=8 sts=2 sw=2 et
+    autocmd FileType lisp setlocal ts=8 sts=2 sw=2 et
 
     " scala 微调
-    au FileType scala setlocal sts=4 sw=4 noet
+    autocmd FileType scala setlocal sts=4 sw=4 noet
 
     " haskell 进行微调
-    au FileType haskell setlocal et
+    autocmd FileType haskell setlocal et
 
     " 强制对某些扩展名的 filetype 进行纠正
-    au BufNewFile,BufRead *.as setlocal filetype=actionscript
-    au BufNewFile,BufRead *.pro setlocal filetype=prolog
-    au BufNewFile,BufRead *.es setlocal filetype=erlang
-    au BufNewFile,BufRead *.asc setlocal filetype=asciidoc
-    au BufNewFile,BufRead *.vl setlocal filetype=verilog
-    au BufNewFile,BufRead *.sublime-* setlocal filetype=json
+    autocmd BufNewFile,BufRead *.as setlocal filetype=actionscript
+    autocmd BufNewFile,BufRead *.pro setlocal filetype=prolog
+    autocmd BufNewFile,BufRead *.es setlocal filetype=erlang
+    autocmd BufNewFile,BufRead *.asc setlocal filetype=asciidoc
+    autocmd BufNewFile,BufRead *.vl setlocal filetype=verilog
+    autocmd BufNewFile,BufRead *.sublime-* setlocal filetype=json
 augroup END
