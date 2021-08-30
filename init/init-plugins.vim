@@ -176,10 +176,6 @@ if has_key(g:bundle_group, 'editor')
         Plug 'godlygeek/tabular', { 'on': 'Tabularize', 'for': ['markdown', 'conf', 'config', 'text'] }
     endif
 
-    if has_key(s:plugin_subgroup, 'editorconfig')
-        Plug 'editorconfig/editorconfig-vim'
-    endif
-
     if has_key(s:plugin_subgroup, 'sleuth')
         Plug 'mikewy0527/vim-sleuth'
     endif
@@ -277,6 +273,10 @@ if has_key(g:bundle_group, 'developer')
         Plug 'mhinz/vim-signify', { 'on': [] }
     endif
 
+    if has_key(s:plugin_subgroup, 'editorconfig')
+        Plug 'editorconfig/editorconfig-vim'
+    endif
+
     if has_key(s:plugin_subgroup, 'tags')
         "set cscopetag
         "set cscopeprg='gtags-cscope'
@@ -316,7 +316,7 @@ if has_key(g:bundle_group, 'developer')
     endif
 
     if has_key(s:plugin_subgroup, 'ycm')
-        Plug 'Valloric/YouCompleteMe', { 'do': './install.sh --clang-completer --clangd-completer --go-completer --rust-completer', 'on': [] }
+        Plug 'Valloric/YouCompleteMe', { 'do': 'python ./install.py --clang-completer --clangd-completer --go-completer --rust-completer', 'on': [] }
     endif
 
     if has_key(s:plugin_subgroup, 'snippets')
@@ -428,6 +428,17 @@ endif
 if has_key(s:plugin_subgroup, 'sleuth')
     let g:sleuth_neighbor_limit    = 7
     let g:sleuth_buf_max_readlines = 256
+endif
+".}}}2
+
+" editorconfig -------------------------------------------------------------{{{2
+if has_key(s:plugin_subgroup, 'editorconfig')
+    let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
+
+    augroup vimplug_load_editorconfig
+        autocmd!
+        autocmd FileType gitcommit let b:EditorConfig_disable = 1
+    augroup END
 endif
 ".}}}2
 
