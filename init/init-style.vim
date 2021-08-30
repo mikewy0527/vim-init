@@ -76,11 +76,12 @@ if &termguicolors
 endif
 
 " 设置黑色背景
-if $KONSOLETHEME == 'Breath2-Light'
-    set background=light
-else
-    set background=dark
-endif
+" move to init-basic.vim for make sure the plugin got the corrected background
+" if $KONSOLETHEME == 'Breath2-Light'
+"     set background=light
+" else
+"     set background=dark
+" endif
 
 " 允许 256 色
 set t_Co=256

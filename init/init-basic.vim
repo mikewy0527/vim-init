@@ -158,3 +158,10 @@ set wildignore+=*.linux2,*.win32,*.darwin,*.freebsd,*.linux,*.android
 set wildignore+=*.mo,*.Po
 
 set wildignorecase
+
+" 设置黑色背景
+if $KONSOLETHEME == 'Breath2-Light'
+    set background=light
+else
+    set background=dark
+endif
