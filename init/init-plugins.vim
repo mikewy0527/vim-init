@@ -361,11 +361,6 @@ if has_key(s:plugin_subgroup, 'fern')
     let g:loaded_netrwSettings     = 1
     let g:loaded_netrwFileHandlers = 1
 
-    augroup my-fern-hijack
-        autocmd!
-        autocmd BufEnter * ++nested call s:hijack_directory()
-    augroup END
-
     function! s:hijack_directory() abort
         let path = expand('%:p')
         if !isdirectory(path)
@@ -374,6 +369,11 @@ if has_key(s:plugin_subgroup, 'fern')
         bwipeout %
         execute printf('Fern %s', fnameescape(path))
     endfunction
+
+    augroup vimplug_load_fern_hijack
+        autocmd!
+        autocmd BufEnter * ++nested call s:hijack_directory()
+    augroup END
 
     " Custom settings and mappings.
     let g:fern#disable_default_mappings = 1
@@ -401,7 +401,7 @@ if has_key(s:plugin_subgroup, 'fern')
         nmap <buffer><nowait> > <Plug>(fern-action-enter)
     endfunction
 
-    augroup FernGroup
+    augroup vimplug_load_fern_init
         autocmd!
         autocmd FileType fern call FernInit()
     augroup END
@@ -415,7 +415,7 @@ if has_key(s:plugin_subgroup, 'fern')
         nmap <silent> <buffer> q      <Plug>(fern-quit-or-close-preview)
     endfunction
 
-    augroup fern-settings
+    augroup vimplug_load_fern_settings
         autocmd!
         autocmd FileType fern call s:fern_settings()
     augroup END
