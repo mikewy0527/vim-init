@@ -69,6 +69,7 @@ endif
 " ft_enhance group --------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'ft_enhance')
     let s:plugin_subgroup['cpp-enhance-hi'] = 1
+    let s:plugin_subgroup['cppman']         = 1
     let s:plugin_subgroup['pysynenhance']   = 1
     let s:plugin_subgroup['rustsynenhance'] = 1
     let s:plugin_subgroup['orgmode']        = 1
@@ -206,6 +207,10 @@ endif
 if has_key(g:bundle_group, 'ft_enhance')
     if has_key(s:plugin_subgroup, 'cpp-enhance-hi')
         Plug 'mikewy0527/vim-cpp-enhanced-highlight', { 'on': [], 'for': ['c', 'cpp'] }
+    endif
+
+    if has_key(s:plugin_subgroup, 'cppman')
+        Plug 'mikewy0527/vim-cppman', { 'on': [], 'for': ['c', 'cpp'] }
     endif
 
     if has_key(s:plugin_subgroup, 'pysynenhance')
@@ -397,6 +402,7 @@ if has_key(s:plugin_subgroup, 'fern')
         nmap <buffer> - <Plug>(fern-action-mark:toggle)
         nmap <buffer> b <Plug>(fern-action-open:split)
         nmap <buffer> v <Plug>(fern-action-open:vsplit)
+        nmap <buffer> t <Plug>(fern-action-open:tabedit)
         nmap <buffer><nowait> < <Plug>(fern-action-leave)
         nmap <buffer><nowait> > <Plug>(fern-action-enter)
     endfunction
@@ -453,6 +459,13 @@ if has_key(s:plugin_subgroup, 'cpp-enhance-hi')
     let g:cpp_concepts_highlight                     = 1
     let g:cpp_operator_highlight                     = 1
     let c_no_curly_error                             = 1
+endif
+".}}}2
+
+" cppman ------------------------------------------------------------------{{{2
+if has_key(s:plugin_subgroup, 'cppman')
+    let g:cppman_open_mode  = 'auto'
+    let g:cppman_no_keymaps = 0
 endif
 ".}}}2
 
