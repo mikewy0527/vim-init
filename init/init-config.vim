@@ -134,7 +134,11 @@ silent! call mkdir(expand('~/.vim/.undo.d'), "p", 0755)
 "----------------------------------------------------------------------
 
 " replace plugin 'chrisbra/vim-diff-enhanced'
-set diffopt+=internal,algorithm:patience
+if has('mac') && $VIM == '/usr/share/vim'
+    set diffopt-=internal
+elseif has('patch-8.1.0360')
+    set diffopt+=internal,algorithm:patience
+endif
 
 " 修正 ScureCRT/XShell 以及某些终端乱码问题，主要原因是不支持一些
 " 终端控制命令，比如 cursor shaping 这类更改光标形状的 xterm 终端命令

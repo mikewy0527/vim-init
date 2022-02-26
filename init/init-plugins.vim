@@ -42,6 +42,10 @@ if has_key(g:bundle_group, 'basic')
     let s:plugin_subgroup['barbaric']   = 1
     let s:plugin_subgroup['motion']     = 1
     let s:plugin_subgroup['choosewin']  = 1
+
+    if !has('patch-8.1.0360')
+        let s:plugin_subgroup['diffenhance']  = 1
+    endif
 endif
 ".}}}2
 
@@ -143,6 +147,10 @@ if has_key(g:bundle_group, 'basic')
     if has_key(s:plugin_subgroup, 'choosewin')
         " 使用 ALT+e 会在不同窗口/标签上显示 A/B/C 等编号，然后字母直接跳转
         Plug 't9md/vim-choosewin'
+    endif
+
+    if has_key(s:plugin_subgroup, 'diffenhance')
+        Plug 'chrisbra/vim-diff-enhanced'
     endif
 endif
 ".}}}2
@@ -434,6 +442,15 @@ endif
 if has_key(s:plugin_subgroup, 'sleuth')
     let g:sleuth_neighbor_limit    = 7
     let g:sleuth_buf_max_readlines = 256
+endif
+".}}}2
+
+" vim-diff-enhance --------------------------------------------------------{{{2
+if has_key(s:plugin_subgroup, 'diffenhance')
+    " started In Diff-Mode set diffexpr (plugin not loaded yet)
+    if &diff
+        let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+    endif
 endif
 ".}}}2
 
