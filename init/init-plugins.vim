@@ -338,7 +338,7 @@ if has_key(g:bundle_group, 'developer')
     endif
 
     if has_key(s:plugin_subgroup, 'ycm')
-        Plug 'Valloric/YouCompleteMe', { 'do': 'python ./install.py --clang-completer --clangd-completer --go-completer --rust-completer', 'on': [] }
+        Plug 'Valloric/YouCompleteMe', { 'do': 'python ./install.py --ninja --clang-completer --clangd-completer --go-completer --rust-completer', 'on': [] }
     endif
 
     if has_key(s:plugin_subgroup, 'snippets')
