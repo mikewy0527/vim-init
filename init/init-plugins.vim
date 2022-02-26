@@ -1167,7 +1167,7 @@ if has_key(s:plugin_subgroup, 'snippets')
 
 
     if !exists("g:UltiSnipsExpandTrigger")
-        let g:UltiSnipsExpandTrigger = '<leader><CR>'
+        let g:UltiSnipsExpandTrigger = '<Leader><Tab>'
     endif
 
     if !exists("g:UltiSnipsJumpForwardTrigger")
