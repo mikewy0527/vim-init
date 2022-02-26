@@ -187,7 +187,7 @@ if has_key(g:bundle_group, 'editor')
     endif
 
     if has_key(s:plugin_subgroup, 'sleuth')
-        Plug 'mikewy0527/vim-sleuth'
+        Plug 'tpope/vim-sleuth'
     endif
 
     if has_key(s:plugin_subgroup, 'repeat')
