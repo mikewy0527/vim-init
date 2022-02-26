@@ -360,6 +360,10 @@ if has_key(s:plugin_subgroup, 'commentary')
         autocmd!
 
         autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
+
+        " Correct commenting on ssh config
+        autocmd FileType dosini,sshconfig,sshdconfig setlocal commentstring=#%s
+        autocmd FileType dosini,sshconfig,sshdconfig let b:commentary_format = &commentstring
     augroup end
 endif
 ".}}}2
