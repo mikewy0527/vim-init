@@ -196,6 +196,10 @@ if has_key(g:bundle_group, 'editor')
 
     if has_key(s:plugin_subgroup, 'surround')
         Plug 'tpope/vim-surround'
+        " Plug 'jiangmiao/auto-pairs'
+
+        " Alternative
+        " Plug 'machakann/vim-sandwich'
     endif
 
     if has_key(s:plugin_subgroup, 'matchup')
@@ -844,7 +848,7 @@ if has_key(s:plugin_subgroup, 'ale')
     endif
 
     " 允许 airline 集成
-    let g:airline#extensions#ale#enabled = 1
+    " let g:airline#extensions#ale#enabled = 1
 
     let g:ale_sign_error                 = '>>'
     let g:ale_sign_warning               = '!!'
@@ -1171,7 +1175,7 @@ if has_key(s:plugin_subgroup, 'snippets')
     endif
 
     if !exists("g:UltiSnipsJumpBackwardTrigger")
-        let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
+        let g:UltiSnipsJumpBackwardTrigger = "<S-tab>"
     endif
 
     autocmd InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
