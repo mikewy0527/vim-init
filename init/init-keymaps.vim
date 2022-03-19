@@ -342,14 +342,14 @@ inoremap <M-K> <Esc><C-w>k
 if has('terminal') && exists(':terminal') == 2 && has('patch-8.1.1')
     " workaround for binding keys with meta key
     if has('vim9script')
-        def FixMetaReadline()
+        def! FixMetaReadline()
             for key in (range(char2nr('a'), char2nr('z'))
                       + range(char2nr('A'), char2nr('Z')))->mapnew((_, v) => nr2char(v))
                 execute 'tnoremap <M-' .. key .. '> <Esc>' .. key
             endfor
         enddef
     else
-        function FixMetaReadline() abort
+        function! FixMetaReadline() abort
             for key in map(range(char2nr('a'), char2nr('z')) + range(char2nr('A'), char2nr('Z')), 'nr2char(v:val)')
                 exe 'tno <m-' .. key .. '> <esc>' .. key
             endfor
