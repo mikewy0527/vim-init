@@ -45,7 +45,9 @@ if exists('+termguicolors')
         let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
         let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
     endif
-    set termguicolors
+    if $TERM != 'linux'
+        set termguicolors
+    endif
 endif
 
 if &termguicolors
@@ -73,6 +75,13 @@ if &termguicolors
                             \]
         endif
     endif
+else
+    let g:terminal_ansi_colors = [
+                    \ "#232627", "#ba362a", "#10be13", "#e6ab45",
+                    \ "#1d99f3", "#9b59b6", "#1abc9c", "#e6e6e6",
+                    \ "#7f8c8d", "#f74782", "#19ca8c", "#ec6e00",
+                    \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
+                    \]
 endif
 
 " 设置黑色背景
@@ -83,11 +92,15 @@ endif
 "     set background=dark
 " endif
 
-" 允许 256 色
-set t_Co=256
+if $TERM != 'linux'
+    " 允许 256 色
+    set t_Co=256
 
-" 设置颜色主题，会在所有 runtimepaths 的 colors 目录寻找同名配置
-colorscheme one
+    " 设置颜色主题，会在所有 runtimepaths 的 colors 目录寻找同名配置
+    colorscheme one
+else
+    colorscheme solarized8
+endif
 
 " 设置背景透明
 hi! Normal ctermfg=NONE ctermbg=NONE guifg=NONE guibg=NONE
@@ -105,6 +118,16 @@ set statusline+=\ %y                            " 文件类型
 
 " 最右边显示文件编码和行号等信息，并且固定在一个 group 中，优先占位
 set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\":\"\")}]\ %v:%l/%L%)
+if $TERM == 'linux'
+    hi! TabLine ctermbg=black ctermfg=lightgreen
+    hi! TabLineFill ctermbg=gray ctermfg=lightcyan
+    hi! TabLineSel ctermbg=gray ctermfg=brown
+
+    hi! StatusLine ctermbg=gray ctermfg=lightcyan
+    hi! StatusLineNC ctermbg=gray ctermfg=lightgray
+    hi! StatusLineTerm ctermbg=lightcyan ctermfg=gray
+    hi! StatusLineTermNC ctermbg=gray ctermfg=lightgray
+endif
 
 
 "----------------------------------------------------------------------
@@ -140,6 +163,20 @@ if exists('+completepopup')
     set completepopup=align:menu,border:off,highlight:PMenu
     set completepopup=align:menu,border:off,highlight:PMenuSel
     set completeopt+=popup
+endif
+
+if $TERM != 'linux'
+    if get(g:, 'colors_name', 'default') == 'default'
+        highlight! DiffAdd    cterm=BOLD ctermfg=255 ctermbg=22
+        highlight! DiffDelete cterm=BOLD ctermfg=52 ctermbg=52
+        highlight! DiffChange cterm=BOLD ctermfg=250 ctermbg=23
+        highlight! DiffText   cterm=BOLD ctermfg=255 ctermbg=30
+    endif
+else
+    highlight DiffAdd    cterm=BOLD ctermfg=white ctermbg=cyan
+    highlight DiffDelete cterm=BOLD ctermfg=darkblue ctermbg=darkblue
+    highlight DiffChange cterm=BOLD ctermfg=gray ctermbg=magenta
+    highlight DiffText   cterm=BOLD ctermfg=white ctermbg=brown
 endif
 
 

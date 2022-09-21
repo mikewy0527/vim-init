@@ -36,11 +36,16 @@ endif
 
 " basic group -------------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'basic')
-    let s:plugin_subgroup['one']        = 1
-    let s:plugin_subgroup['fern']       = 1
+    if $TERM != 'linux'
+        let s:plugin_subgroup['one']        = 1
+        let s:plugin_subgroup['fern']       = 1
+        let s:plugin_subgroup['barbaric']   = 1
+        let s:plugin_subgroup['motion']     = 1
+    else
+        let s:plugin_subgroup['solarized8'] = 1
+    endif
+
     let s:plugin_subgroup['commentary'] = 1
-    let s:plugin_subgroup['barbaric']   = 1
-    let s:plugin_subgroup['motion']     = 1
     let s:plugin_subgroup['choosewin']  = 1
 
     if !has('patch-8.1.0360')
@@ -51,9 +56,11 @@ endif
 
 " colortheme group --------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'colortheme')
-    let s:plugin_subgroup['hexokinase'] = 1
-    " let s:plugin_subgroup['airline']    = 1
-    let s:plugin_subgroup['lightline']  = 1
+    if $TERM != 'linux'
+        let s:plugin_subgroup['hexokinase'] = 1
+        " let s:plugin_subgroup['airline']    = 1
+        let s:plugin_subgroup['lightline']  = 1
+    endif
 endif
 ".}}}2
 
@@ -73,11 +80,13 @@ endif
 
 " ft_enhance group --------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'ft_enhance')
-    let s:plugin_subgroup['cpp-enhance-hi'] = 1
-    let s:plugin_subgroup['cppman']         = 1
-    let s:plugin_subgroup['pysynenhance']   = 1
-    let s:plugin_subgroup['rustsynenhance'] = 1
-    let s:plugin_subgroup['orgmode']        = 1
+    if $TERM != 'linux'
+        let s:plugin_subgroup['cpp-enhance-hi'] = 1
+        let s:plugin_subgroup['cppman']         = 1
+        let s:plugin_subgroup['pysynenhance']   = 1
+        let s:plugin_subgroup['rustsynenhance'] = 1
+        let s:plugin_subgroup['orgmode']        = 1
+    endif
 endif
 ".}}}2
 
@@ -96,16 +105,18 @@ endif
 
 " developer group ----------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'developer')
-    let s:plugin_subgroup['editorconfig'] = 1
-    let s:plugin_subgroup['fugitive']     = 1
-    let s:plugin_subgroup['signify']      = 1
-    let s:plugin_subgroup['tags']         = 1
-    let s:plugin_subgroup['preview']      = 1
-    let s:plugin_subgroup['ale']          = 1
-    let s:plugin_subgroup['echodoc']      = 1
-    let s:plugin_subgroup['leaderf']      = 1
-    let s:plugin_subgroup['ycm']          = 1
-    let s:plugin_subgroup['snippets']     = 1
+    if $TERM != 'linux'
+        let s:plugin_subgroup['editorconfig'] = 1
+        let s:plugin_subgroup['fugitive']     = 1
+        let s:plugin_subgroup['signify']      = 1
+        let s:plugin_subgroup['tags']         = 1
+        let s:plugin_subgroup['preview']      = 1
+        let s:plugin_subgroup['ale']          = 1
+        let s:plugin_subgroup['echodoc']      = 1
+        let s:plugin_subgroup['leaderf']      = 1
+        let s:plugin_subgroup['ycm']          = 1
+        let s:plugin_subgroup['snippets']     = 1
+    endif
 endif
 ".}}}2
 ".}}}1
@@ -120,6 +131,10 @@ if has_key(g:bundle_group, 'basic')
             " Use the fork for better performance than 'rakr/vim-one', but have bug in switch color theme
             Plug 'mikewy0527/vim-one'
         endif
+    endif
+
+    if has_key(s:plugin_subgroup, 'solarized8')
+        Plug 'lifepillar/vim-solarized8'
     endif
 
     if !s:is_logfile
@@ -215,7 +230,7 @@ if has_key(g:bundle_group, 'editor')
     endif
 
     if has_key(s:plugin_subgroup, 'nginx')
-        Plug 'chr4/nginx.vim'
+        Plug 'chr4/nginx.vim', { 'for': ['nginx'] }
     endif
 endif
 ".}}}2
@@ -421,6 +436,7 @@ if has_key(s:plugin_subgroup, 'fern')
         nmap <buffer> h <Plug>(fern-action-hidden:toggle)
         nmap <buffer> r <Plug>(fern-action-reload)
         nmap <buffer> - <Plug>(fern-action-mark:toggle)
+        nmap <buffer> o <Plug>(fern-action-open)
         nmap <buffer> b <Plug>(fern-action-open:split)
         nmap <buffer> v <Plug>(fern-action-open:vsplit)
         nmap <buffer> t <Plug>(fern-action-open:tabedit)
