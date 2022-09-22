@@ -169,8 +169,8 @@ if $TERM != 'linux'
     if get(g:, 'colors_name', 'default') == 'default'
         highlight! DiffAdd    cterm=BOLD ctermfg=255 ctermbg=22
         highlight! DiffDelete cterm=BOLD ctermfg=52 ctermbg=52
-        highlight! DiffChange cterm=BOLD ctermfg=250 ctermbg=23
-        highlight! DiffText   cterm=BOLD ctermfg=255 ctermbg=30
+        highlight! DiffChange cterm=BOLD ctermfg=250 ctermbg=61
+        highlight! DiffText   cterm=BOLD ctermfg=255 ctermbg=104
     endif
 else
     highlight DiffAdd    cterm=BOLD ctermfg=white ctermbg=cyan
