@@ -166,7 +166,7 @@ if exists('+completepopup')
 endif
 
 if $TERM != 'linux'
-    if get(g:, 'colors_name', 'default') == 'default'
+    if get(g:, 'colors_name', 'default') == 'default' || !&termguicolors
         highlight! DiffAdd    cterm=BOLD ctermfg=255 ctermbg=22
         highlight! DiffDelete cterm=BOLD ctermfg=52 ctermbg=52
         highlight! DiffChange cterm=BOLD ctermfg=250 ctermbg=61
