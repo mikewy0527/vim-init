@@ -336,8 +336,7 @@ if has_key(g:bundle_group, 'developer')
     endif
 
     if has_key(s:plugin_subgroup, 'ale')
-        let g:ale_disable_lsp = 1
-        " Plug 'dense-analysis/ale', { 'on': [], 'for': ['c', 'cpp'] }
+        let g:ale_completion_enabled = 0
         Plug 'dense-analysis/ale', { 'on': [] }
     endif
 
@@ -353,7 +352,7 @@ if has_key(g:bundle_group, 'developer')
     endif
 
     if has_key(s:plugin_subgroup, 'ycm')
-        Plug 'Valloric/YouCompleteMe', { 'do': 'python ./install.py --ninja --clangd-completer --go-completer --rust-completer', 'on': [] }
+        Plug 'Valloric/YouCompleteMe', { 'do': 'python ./install.py --ninja --clangd-completer', 'on': [] }
     endif
 
     if has_key(s:plugin_subgroup, 'snippets')
@@ -840,7 +839,6 @@ if has_key(s:plugin_subgroup, 'ale')
         if !exists('g:ale_enabled')
             call plug#load('ale')
             let g:ale_enabled = 0
-            exec 'ALEToggle'
         endif
         exec 'ALEToggle'
     endfunction
@@ -888,21 +886,23 @@ if has_key(s:plugin_subgroup, 'ale')
         \ 'c'     : ['clang', 'cppcheck', 'splint'],
         \ 'cpp'   : ['clang', 'cppcheck', 'splint'],
         \ 'go'    : ['gopls', 'gofmt', 'golint', 'govet'],
-        \ 'python': ['flake8', 'mypy', 'pylint', 'pyright'],
+        \ 'python': ['flake8', 'pylint', 'pyright', 'mypy', 'ruff'],
         \ 'rust'  : ['rustc', 'cargo', 'rls'],
         \ 'sh'    : ['bashate', 'shell', 'shellcheck'],
         \ 'tex'   : ['texlab'],
         \ 'zsh'   : ['bashate', 'shell', 'shellcheck'],
+        \ 'zig'   : ['zls'],
         \ }
 
     let g:ale_fixers = {
         \ 'c'     : ['clang-format'],
         \ 'cpp'   : ['clang-format'],
         \ 'go'    : ['gofmt', 'goimports', 'gomod'],
-        \ 'python': ['autopep8', 'yapf', 'isort'],
+        \ 'python': ['autopep8', 'yapf', 'isort', 'ruff'],
         \ 'rust'  : ['rustfmt'],
         \ 'sh'    : ['shfmt'],
         \ 'zsh'   : ['shfmt'],
+        \ 'zig'   : ['zls'],
         \ }
 
     " 获取 pylint, flake8 的配置文件，在 vim-init/tools/conf 下面
@@ -922,11 +922,11 @@ if has_key(s:plugin_subgroup, 'ale')
     let g:ale_python_pylint_options .= ' --disable=W'
 
     let g:ale_c_cc_options         = '-std=c2x -Wall'
-    let g:ale_cpp_cc_options       = '-std=c++2a -Wall'
+    let g:ale_cpp_cc_options       = '-std=c++23 -Wall'
     let g:ale_c_clang_options      = '-Wall -O2 -std=c2x'
-    let g:ale_cpp_clang_options    = '-Wall -O2 -std=c++2a -x c++'
+    let g:ale_cpp_clang_options    = '-Wall -O2 -std=c++23 -x c++'
     let g:ale_c_gcc_options        = '-Wall -O2 -std=c2x'
-    let g:ale_cpp_gcc_options      = '-Wall -O2 -std=c++2a -x c++'
+    let g:ale_cpp_gcc_options      = '-Wall -O2 -std=c++23 -x c++'
     let g:ale_c_cppcheck_options   = ''
     let g:ale_cpp_cppcheck_options = ''
 
@@ -1049,7 +1049,7 @@ if has_key(s:plugin_subgroup, 'ycm')
     function! LazyLoadingYMC()
         if g:YouCompleteMeLazyLoaded == 0
             let g:YouCompleteMeLazyLoaded = 1
-            call plug#load('YouCompleteMe') | call youcompleteme#Enable()
+            call plug#load('YouCompleteMe')
         endif
     endfunction
     augroup vimplug_load_ycm
@@ -1078,22 +1078,39 @@ if has_key(s:plugin_subgroup, 'ycm')
 
     " 两个字符自动触发语义补全
     let g:ycm_semantic_triggers =  {
-            \ 'c,cpp,python,java,go,erlang,perl' : ['re!\w{2}'],
-            \ 'cs,lua,javascript'                : ['re!\w{2}'],
+            \ 'c,cpp,go,zig'            : ['re!\w{2}'],
+            \ 'python,java,erlang,perl' : ['re!\w{2}'],
+            \ 'cs,lua,javascript'       : ['re!\w{2}'],
         \ }
+
+    " for zig zls (Zig Language Server)
+    augroup vimplug_ycm_zig_zls
+        autocmd!
+
+        autocmd BufNewFile,BufRead *.zig set filetype=zig
+    augroup end
+
+    let g:ycm_language_server = [
+            \ {
+            \   'name': 'zls',
+            \   'filetypes': [ 'zig' ],
+            \   'cmdline': [ 'zls' ]
+            \ }
+        \ ]
 
     " Ycm 白名单（非名单内文件不启用 YCM），避免打开个 1MB 的 txt 分析半天
     let g:ycm_filetype_whitelist = {
             \ "c"          : 1,
             \ "cpp"        : 1,
+            \ "zig"        : 1,
             \ "objc"       : 1,
             \ "objcpp"     : 1,
+            \ "go"         : 1,
             \ "python"     : 1,
             \ "java"       : 1,
             \ "javascript" : 1,
             \ "coffee"     : 1,
             \ "vim"        : 1,
-            \ "go"         : 1,
             \ "cs"         : 1,
             \ "lua"        : 1,
             \ "perl"       : 1,
@@ -1202,6 +1219,7 @@ if has_key(s:plugin_subgroup, 'snippets')
     autocmd InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
 endif
 ".}}}2
+
 ".}}}1
 
 " vim: set fdl=0 fdm=marker:

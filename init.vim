@@ -34,7 +34,7 @@ set t_vb=
 "----------------------------------------------------------------------
 
 " Fix slow with ruby syntax highlighting
-set regexpengine=1
+set regexpengine=0
 
 let g:disable_all_plugin = 1
 let g:logfile_loadplug_size_limit = 30000000
