@@ -160,7 +160,7 @@ set wildignore+=*.mo,*.Po
 set wildignorecase
 
 " 设置黑色背景
-if $KONSOLETHEME == 'Breath2-Light'
+if $KONSOLETHEME =~ '-Light'
     set background=light
 else
     set background=dark

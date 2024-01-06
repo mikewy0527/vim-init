@@ -58,35 +58,35 @@ if &termguicolors
                         \ "#7f8c8d", "#f74782", "#55a649", "#f67400",
                         \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
                         \]
-    else
-        if $KONSOLETHEME == 'Breath2-Dark'
-            let g:terminal_ansi_colors = [
-                            \ "#1e2229", "#af4633", "#4c9947", "#b98537",
-                            \ "#1987d1", "#9b59b6", "#18b092", "#d3d3d3",
-                            \ "#7f8c8d", "#f74782", "#6c9947", "#ec6e00",
-                            \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
-                            \]
-        else
-            let g:terminal_ansi_colors = [
-                            \ "#232627", "#ba362a", "#10be13", "#e6ab45",
-                            \ "#1d99f3", "#9b59b6", "#1abc9c", "#e6e6e6",
-                            \ "#7f8c8d", "#f74782", "#19ca8c", "#ec6e00",
-                            \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
-                            \]
-        endif
+    elseif $KONSOLETHEME == 'Breath2-Dark'
+        let g:terminal_ansi_colors = [
+                        \ "#1e2229", "#af4633", "#4c9947", "#b98537",
+                        \ "#1987d1", "#9b59b6", "#18b092", "#d3d3d3",
+                        \ "#7f8c8d", "#f74782", "#6c9947", "#ec6e00",
+                        \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
+                        \]
+    elseif $KONSOLETHEME == 'Breeze-Dark'
+        let g:terminal_ansi_colors = [
+                        \ "#232627", "#ba362a", "#10be13", "#e6ab45",
+                        \ "#1d99f3", "#9b59b6", "#1abc9c", "#e6e6e6",
+                        \ "#7f8c8d", "#f74782", "#19ca8c", "#ec6e00",
+                        \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
+                        \]
     endif
 else
-    let g:terminal_ansi_colors = [
-                    \ "#232627", "#ba362a", "#10be13", "#e6ab45",
-                    \ "#1d99f3", "#9b59b6", "#1abc9c", "#e6e6e6",
-                    \ "#7f8c8d", "#f74782", "#19ca8c", "#ec6e00",
-                    \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
-                    \]
+    if $KONSOLETHEME !~ 'Solarized'
+        let g:terminal_ansi_colors = [
+                        \ "#232627", "#ba362a", "#10be13", "#e6ab45",
+                        \ "#1d99f3", "#9b59b6", "#1abc9c", "#e6e6e6",
+                        \ "#7f8c8d", "#f74782", "#19ca8c", "#ec6e00",
+                        \ "#3daee9", "#ae81ff", "#85dc85", "#e2637f"
+                        \]
+    endif
 endif
 
 " 设置黑色背景
 " move to init-basic.vim for make sure the plugin got the corrected background
-" if $KONSOLETHEME == 'Breath2-Light'
+" if $KONSOLETHEME =~ '-Light'
 "     set background=light
 " else
 "     set background=dark
@@ -97,7 +97,11 @@ if $TERM != 'linux'
     set t_Co=256
 
     " 设置颜色主题，会在所有 runtimepaths 的 colors 目录寻找同名配置
-    colorscheme one
+    if $KONSOLETHEME =~ 'Solarized'
+        colorscheme solarized8
+    else
+        colorscheme one
+    endif
 else
     colorscheme solarized8
 endif
@@ -154,10 +158,16 @@ endif
 
 " 去掉 sign column 的白色背景
 hi! SignColumn guibg=NONE ctermbg=NONE
+if $KONSOLETHEME =~ 'Solarized'
+    hi! LineNr guibg=NONE ctermbg=NONE
+endif
 
 " 修正补全目录的色彩：默认太难看
-hi! PMenu ctermfg=78 ctermbg=240 guifg=#98fb98 guibg=#364963
-hi! PMenuSel ctermfg=253 ctermbg=103 guifg=#e6e6e6 guibg=#8096b3
+if $KONSOLETHEME !~ 'Solarized'
+    hi! PMenu ctermfg=78 ctermbg=240 guifg=#98fb98 guibg=#364963
+    hi! PMenuSel ctermfg=253 ctermbg=103 guifg=#e6e6e6 guibg=#8096b3
+endif
+
 set completeopt=menu,menuone,noselect
 if exists('+completepopup')
     set completepopup=align:menu,border:off,highlight:PMenu
@@ -171,6 +181,16 @@ if $TERM != 'linux'
         highlight! DiffDelete cterm=BOLD ctermfg=52 ctermbg=52
         highlight! DiffChange cterm=BOLD ctermfg=250 ctermbg=61
         highlight! DiffText   cterm=BOLD ctermfg=255 ctermbg=104
+    elseif $KONSOLETHEME =~ 'Solarized-Dark'
+        hi DiffAdd guifg=#a0a0a0 guibg=#447555 guisp=#447555 gui=NONE
+        hi DiffChange guifg=#e0e0e0 guibg=#3f3b73 guisp=#3f3b73 gui=NONE
+        hi DiffDelete guifg=#554253 guibg=#554253 guisp=NONE gui=BOLD
+        hi DiffText guifg=#f0f0f0 guibg=#5e58ad guisp=#5e58ad gui=NONE
+    elseif $KONSOLETHEME =~ 'Solarized-Light'
+        hi DiffAdd guifg=#6d6d6d guibg=#a5d5a4 guisp=#a5d5a4 gui=NONE
+        hi DiffChange guifg=#e0e0e0 guibg=#635b87 guisp=#635b87 gui=NONE
+        hi DiffDelete guifg=#ad8f96 guibg=#ad8f96 guisp=NONE gui=BOLD
+        hi DiffText guifg=#f0f0f0 guibg=#9386c8 guisp=#9386c8 gui=NONE
     endif
 else
     highlight DiffAdd    cterm=BOLD ctermfg=white ctermbg=cyan

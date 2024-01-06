@@ -37,7 +37,11 @@ endif
 " basic group -------------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'basic')
     if $TERM != 'linux'
-        let s:plugin_subgroup['one']        = 1
+        if $KONSOLETHEME =~ 'Solarized'
+            let s:plugin_subgroup['solarized8'] = 1
+        else
+            let s:plugin_subgroup['one']        = 1
+        endif
         let s:plugin_subgroup['fern']       = 1
         let s:plugin_subgroup['barbaric']   = 1
         let s:plugin_subgroup['motion']     = 1
@@ -131,10 +135,12 @@ if has_key(g:bundle_group, 'basic')
             " Use the fork for better performance than 'rakr/vim-one', but have bug in switch color theme
             Plug 'mikewy0527/vim-one'
         endif
+        let s:activated_colorscheme='one'
     endif
 
     if has_key(s:plugin_subgroup, 'solarized8')
         Plug 'lifepillar/vim-solarized8'
+        let s:activated_colorscheme='solarized'
     endif
 
     if !s:is_logfile
@@ -352,7 +358,7 @@ if has_key(g:bundle_group, 'developer')
     endif
 
     if has_key(s:plugin_subgroup, 'ycm')
-        Plug 'Valloric/YouCompleteMe', { 'do': 'python ./install.py --ninja --clangd-completer', 'on': [] }
+        Plug 'Valloric/YouCompleteMe', { 'do': 'python ./install.py --ninja --clangd-completer --go-completer', 'on': [] }
     endif
 
     if has_key(s:plugin_subgroup, 'snippets')
@@ -791,7 +797,7 @@ endif
 " lightline ---------------------------------------------------------------{{{2
 if has_key(s:plugin_subgroup, 'lightline')
     let g:lightline = {
-        \   'colorscheme': 'one',
+        \   'colorscheme': s:activated_colorscheme,
         \   'active': {
         \     'left': [
         \       ['mode', 'paste'],
