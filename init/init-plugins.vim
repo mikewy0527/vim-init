@@ -77,7 +77,6 @@ if has_key(g:bundle_group, 'editor')
     let s:plugin_subgroup['surround']     = 1
     let s:plugin_subgroup['matchup']      = 1
     let s:plugin_subgroup['unimpaired']   = 1
-    let s:plugin_subgroup['multicursor']  = 1
     let s:plugin_subgroup['nginx']        = 1
 endif
 ".}}}2
@@ -229,10 +228,6 @@ if has_key(g:bundle_group, 'editor')
 
     if has_key(s:plugin_subgroup, 'unimpaired')
         Plug 'tpope/vim-unimpaired'
-    endif
-
-    if has_key(s:plugin_subgroup, 'multicursor')
-        Plug 'mg979/vim-visual-multi'
     endif
 
     if has_key(s:plugin_subgroup, 'nginx')
