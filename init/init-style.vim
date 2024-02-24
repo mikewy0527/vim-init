@@ -177,20 +177,20 @@ endif
 
 if $TERM != 'linux'
     if get(g:, 'colors_name', 'default') == 'default' || !&termguicolors
-        highlight! DiffAdd    cterm=BOLD ctermfg=255 ctermbg=22
+        highlight! DiffAdd    cterm=BOLD ctermfg=235 ctermbg=22
         highlight! DiffDelete cterm=BOLD ctermfg=52 ctermbg=52
-        highlight! DiffChange cterm=BOLD ctermfg=250 ctermbg=61
+        highlight! DiffChange cterm=BOLD ctermfg=235 ctermbg=61
         highlight! DiffText   cterm=BOLD ctermfg=255 ctermbg=104
     elseif $KONSOLETHEME =~ 'Solarized-Dark'
         hi DiffAdd guifg=#a0a0a0 guibg=#447555 guisp=#447555 gui=NONE
-        hi DiffChange guifg=#e0e0e0 guibg=#3f3b73 guisp=#3f3b73 gui=NONE
+        hi DiffChange guifg=#808080 guibg=#3f3b73 guisp=#3f3b73 gui=NONE
         hi DiffDelete guifg=#554253 guibg=#554253 guisp=NONE gui=BOLD
-        hi DiffText guifg=#f0f0f0 guibg=#5e58ad guisp=#5e58ad gui=NONE
+        hi DiffText guifg=#e0e0e0 guibg=#5e58ad guisp=#5e58ad gui=NONE
     elseif $KONSOLETHEME =~ 'Solarized-Light'
         hi DiffAdd guifg=#6d6d6d guibg=#a5d5a4 guisp=#a5d5a4 gui=NONE
-        hi DiffChange guifg=#e0e0e0 guibg=#635b87 guisp=#635b87 gui=NONE
+        hi DiffChange guifg=#d0d0d0 guibg=#635b87 guisp=#635b87 gui=NONE
         hi DiffDelete guifg=#ad8f96 guibg=#ad8f96 guisp=NONE gui=BOLD
-        hi DiffText guifg=#f0f0f0 guibg=#9386c8 guisp=#9386c8 gui=NONE
+        hi DiffText guifg=#f0f0f0 guibg=#927ec8 guisp=#927ec8 gui=NONE
     endif
 else
     highlight DiffAdd    cterm=BOLD ctermfg=white ctermbg=cyan
