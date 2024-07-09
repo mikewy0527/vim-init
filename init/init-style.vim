@@ -193,10 +193,17 @@ if $TERM != 'linux'
         hi DiffText guifg=#f0f0f0 guibg=#927ec8 guisp=#927ec8 gui=NONE
     endif
 else
-    highlight DiffAdd    cterm=BOLD ctermfg=white ctermbg=cyan
-    highlight DiffDelete cterm=BOLD ctermfg=darkblue ctermbg=darkblue
-    highlight DiffChange cterm=BOLD ctermfg=gray ctermbg=magenta
-    highlight DiffText   cterm=BOLD ctermfg=white ctermbg=brown
+    if $KONSOLETHEME =~ 'Solarized-Dark'
+        highlight DiffAdd    cterm=BOLD ctermfg=white ctermbg=cyan
+        highlight DiffDelete cterm=BOLD ctermfg=darkblue ctermbg=darkblue
+        highlight DiffChange cterm=BOLD ctermfg=gray ctermbg=green
+        highlight DiffText   cterm=BOLD ctermfg=white ctermbg=brown
+    else
+        highlight DiffAdd    cterm=BOLD ctermfg=white ctermbg=cyan
+        highlight DiffDelete cterm=BOLD ctermfg=darkblue ctermbg=darkblue
+        highlight DiffChange cterm=BOLD ctermfg=gray ctermbg=magenta
+        highlight DiffText   cterm=BOLD ctermfg=white ctermbg=brown
+    endif
 endif
 
 
