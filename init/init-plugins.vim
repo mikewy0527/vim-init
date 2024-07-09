@@ -42,9 +42,9 @@ if has_key(g:bundle_group, 'basic')
         else
             let s:plugin_subgroup['one']        = 1
         endif
-        let s:plugin_subgroup['fern']       = 1
+        " let s:plugin_subgroup['fern']       = 1
         let s:plugin_subgroup['barbaric']   = 1
-        let s:plugin_subgroup['motion']     = 1
+        " let s:plugin_subgroup['motion']     = 1
     else
         let s:plugin_subgroup['solarized8'] = 1
     endif
@@ -84,11 +84,11 @@ endif
 " ft_enhance group --------------------------------------------------------{{{2
 if has_key(g:bundle_group, 'ft_enhance')
     if $TERM != 'linux'
-        let s:plugin_subgroup['cpp-enhance-hi'] = 1
-        let s:plugin_subgroup['cppman']         = 1
+        " let s:plugin_subgroup['cpp-enhance-hi'] = 1
+        " let s:plugin_subgroup['cppman']         = 1
         let s:plugin_subgroup['pysynenhance']   = 1
         let s:plugin_subgroup['rustsynenhance'] = 1
-        let s:plugin_subgroup['orgmode']        = 1
+        " let s:plugin_subgroup['orgmode']        = 1
     endif
 endif
 ".}}}2
@@ -116,9 +116,9 @@ if has_key(g:bundle_group, 'developer')
         let s:plugin_subgroup['preview']      = 1
         let s:plugin_subgroup['ale']          = 1
         let s:plugin_subgroup['echodoc']      = 1
-        let s:plugin_subgroup['leaderf']      = 1
+        " let s:plugin_subgroup['leaderf']      = 1
         let s:plugin_subgroup['ycm']          = 1
-        let s:plugin_subgroup['snippets']     = 1
+        " let s:plugin_subgroup['snippets']     = 1
     endif
 endif
 ".}}}2
